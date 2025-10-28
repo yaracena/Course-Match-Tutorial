@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mastering Cognomos Course Match</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* LANDING PAGE STYLES */
+        .landing-container {
+            max-width: 800px;
+            width: 100%;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            margin: 50px auto;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 50px 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .header p {
+            font-size: 1.4em;
+            opacity: 0.95;
+        }
+
+        .landing-content {
+            padding: 50px 40px;
+        }
+
+        .alert-box {
+            background: #fff3cd;
+            border: 3px solid #ffc107;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 35px;
+        }
+
+        .alert-box h2 {
+            color: #856404;
+            margin: 0 0 20px 0;
+            font-size: 1.5em;
+        }
+
+        .alert-box p {
+            color: #856404;
+            line-height: 1.8;
+            margin: 0;
+            font-size: 1.05em;
+        }
+
+        .troubleshooting-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 35px;
+            margin-bottom: 35px;
+        }
+
+        .troubleshooting-section h2 {
+            color: #333;
+            margin: 0 0 25px 0;
+            font-size: 1.6em;
+        }
+
+        .step-item {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 25px;
+            align-items: start;
+        }
+
+        .step-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .step-number {
+            background: #667eea;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2em;
+            flex-shrink: 0;
+        }
+
+        .step-text {
+            flex: 1;
+            padding-top: 8px;
+            line-height: 1.8;
+            color: #333;
+            font-size: 1.05em;
+        }
+
+        .link-section {
+            background: #e7f3ff;
+            border: 3px solid #667eea;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 35px;
+            text-align: center;
+        }
+
+        .link-section p {
+            margin: 0 0 15px 0;
+            color: #333;
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+
+        .link-section a {
+            color: #667eea;
+            font-size: 1.3em;
+            font-weight: bold;
+            text-decoration: none;
+            word-break: break-all;
+        }
+
+        .link-section a:hover {
+            text-decoration: underline;
+        }
+
+        .confirmation-box {
+            background: #d4edda;
+            border: 3px solid #28a745;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .confirmation-box label {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            color: #155724;
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+
+        .confirmation-box input[type="checkbox"] {
+            width: 26px;
+            height: 26px;
+            cursor: pointer;
+        }
+
+        .button-container {
+            text-align: center;
+        }
+
+        .btn-continue {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 18px 50px;
+            font-size: 1.3em;
+            font-weight: bold;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        }
+
+        .btn-continue:hover:not(:disabled) {
+            background: #218838;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+        }
+
+        .btn-continue:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            opacity: 0.6;
+            box-shadow: none;
+        }
+
+        /* TUTORIAL PAGE STYLES */
+        .tutorial-frame {
+            width: 100%;
+            min-height: 100vh;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            margin: 0 auto;
+            max-width: 1200px;
+        }
+
+        .tutorial-message {
+            padding: 100px 40px;
+            text-align: center;
+            color: white;
+        }
+
+        .tutorial-message h2 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+
+        .tutorial-message p {
+            font-size: 1.3em;
+            margin-bottom: 30px;
+        }
+
+        .tutorial-message a {
+            display: inline-block;
+            background: white;
+            color: #667eea;
+            padding: 15px 40px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.1em;
+            transition: all 0.3s;
+        }
+
+        .tutorial-message a:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(255,255,255,0.3);
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .header p {
+                font-size: 1.2em;
+            }
+
+            .landing-content {
+                padding: 35px 25px;
+            }
+
+            .step-item {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .step-number {
+                align-self: flex-start;
+            }
+
+            .step-text {
+                padding-top: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Landing Page -->
+    <div id="landingPage" class="page active">
+        <div class="landing-container">
+            <div class="header">
+                <h1>🎓 Mastering Cognomos Course Match</h1>
+                <p>Can You Access Course Match?</p>
+            </div>
+
+            <div class="landing-content">
+                <div class="alert-box">
+                    <h2>🔧 Unable to See Courses?</h2>
+                    <p>If you are unable to see courses when you access Course Match, this is typically a browser or network issue. Please try the troubleshooting steps below to resolve the problem.</p>
+                </div>
+
+                <div class="troubleshooting-section">
+                    <h2>Please Try the Following Steps:</h2>
+                    
+                    <div class="step-item">
+                        <div class="step-number">1</div>
+                        <div class="step-text">Start a new session in <strong>Chrome</strong> or <strong>Firefox</strong> (recommended browsers).</div>
+                    </div>
+
+                    <div class="step-item">
+                        <div class="step-number">2</div>
+                        <div class="step-text">Close all browser windows and reopen in <strong>Incognito/Private mode</strong>.</div>
+                    </div>
+
+                    <div class="step-item">
+                        <div class="step-number">3</div>
+                        <div class="step-text">Make sure you are using the correct link (see below).</div>
+                    </div>
+
+                    <div class="step-item">
+                        <div class="step-number">4</div>
+                        <div class="step-text">If the issue persists, ensure that <strong>no VPN or firewall</strong> is interfering with the connection.</div>
+                    </div>
+
+                    <div class="step-item">
+                        <div class="step-number">5</div>
+                        <div class="step-text">If you're unsure, please try connecting through <strong>another internet provider or network</strong> (e.g., mobile hotspot, different WiFi).</div>
+                    </div>
+                </div>
+
+                <div class="link-section">
+                    <p>📎 Official Course Match Link:</p>
+                    <a href="https://coursematch.gsb.columbia.edu" target="_blank">coursematch.gsb.columbia.edu</a>
+                </div>
+
+                <div class="confirmation-box">
+                    <label>
+                        <input type="checkbox" id="confirmCheckbox">
+                        <span>I can see courses in Course Match, or I have completed the troubleshooting steps above.</span>
+                    </label>
+                </div>
+
+                <div class="button-container">
+                    <button class="btn-continue" id="continueBtn" disabled>
+                        Continue to Tutorial →
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tutorial Page (Initially Hidden) -->
+    <div id="tutorialPage" class="page">
+        <div class="tutorial-frame">
+            <div class="tutorial-message">
+                <h2>✅ Tutorial Content</h2>
+                <p>The full interactive tutorial with Course Match demo and chatbot would appear here.</p>
+                <p style="font-size: 1em; margin-top: 20px;">To view the complete tutorial with interactive features and chatbot, please open the "How to Use Cognomos Course Match" artifact.</p>
+                <a href="#" onclick="alert('In a real website, this would load the full tutorial page with all interactive features and the chatbot assistant.')">View Full Tutorial</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const confirmCheckbox = document.getElementById('confirmCheckbox');
+        const continueBtn = document.getElementById('continueBtn');
+
+        // Enable continue button when checkbox is checked
+        confirmCheckbox.addEventListener('change', function() {
+            continueBtn.disabled = !this.checked;
+        });
+
+        // Handle continue button click
+        continueBtn.addEventListener('click', function() {
+            // Hide landing page and show tutorial
+            document.getElementById('landingPage').classList.remove('active');
+            document.getElementById('tutorialPage').classList.add('active');
+            
+            // Scroll to top
+            window.scrollTo(0, 0);
+        });
+    </script>
+</body>
+</html>
