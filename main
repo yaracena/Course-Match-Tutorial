@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mastering Cognomos Course Match</title>
+    <style>
+        /* --- GLOBAL RESETS & BASE STYLES --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        /* --- PAGE MANAGEMENT --- */
+        .page { display: none; animation: fadeIn 0.5s ease; }
+        .page.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- CONTAINERS --- */
+        .main-container {
+            max-width: 800px; /* Default narrow width for landing */
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            transition: max-width 0.5s ease;
+        }
+        /* Wider container for the complex tutorial page */
+        #page2 .main-container { max-width: 1100px; }
+
+        /* --- COMMON ELEMENTS --- */
+        header, .header-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 50px 40px;
+            text-align: center;
+        }
+        h1 { font-size: 2.5em; margin-bottom: 15px; text-shadow: 0 2px 10px rgba(0,0,0,0.2); }
+        .subtitle { font-size: 1.3em; opacity: 0.95; line-height: 1.5; }
+        .content-body { padding: 50px 40px; }
+
+        /* --- NAVIGATION BUTTONS --- */
+        .nav-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 2px solid #eee;
+        }
+        .nav-btn {
+            padding: 15px 40px;
+            font-size: 1.2em;
+            font-weight: bold;
+            border-radius: 12px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s;
+            color: white;
+            background: #667eea;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        .nav-btn:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4); }
+        .nav-btn:disabled { background: #ccc; cursor: not-allowed; opacity: 0.7; box-shadow: none; }
+        .nav-btn.secondary { background: #6c757d; box-shadow: none; }
+        .nav-btn.secondary:hover { background: #5a6268; }
+
+        /* --- INFO BOXES (Alerts, Tips, Success) --- */
+        .info-box { padding: 20px 25px; border-radius: 12px; margin-bottom: 25px; line-height: 1.6; }
+        .info-box h3 { margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
+        .alert-box { background: #fff3cd; border-left: 5px solid #ffc107; color: #856404; }
+        .warning-box { background: #f8d7da; border-left: 5px solid #dc3545; color: #721c24; }
+        .success-box { background: #d4edda; border-left: 5px solid #28a745; color: #155724; }
+        .tip-box { background: #f0f4ff; border-left: 5px solid #667eea; color: #444; }
+        .info-box ul { margin-left: 25px; margin-top: 10px; }
+        .info-box li { margin-bottom: 8px; }
+
+        /* --- PAGE 1 SPECIFIC: TROUBLESHOOTING --- */
+        .troubleshooting-steps { background: #f8f9fa; border-radius: 15px; padding: 30px; margin: 30px 0; }
+        .step-item { display: flex; gap: 20px; margin-bottom: 20px; align-items: start; }
+        .step-badge { background: #667eea; color: white; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0; }
+        .step-text { flex: 1; padding-top: 5px; line-height: 1.6; }
+        .readiness-check { background: #e9ecef; padding: 20px; border-radius: 12px; font-weight: bold; display: flex; align-items: center; gap: 15px; cursor: pointer; border: 2px solid #dee2e6; transition: all 0.3s; }
+        .readiness-check:hover { border-color: #667eea; background: #fff; }
+        .readiness-check input { width: 20px; height: 20px; }
+
+        /* --- PAGE 2 SPECIFIC: TUTORIAL STEPS --- */
+        .tutorial-step { margin-bottom: 60px; }
+        .step-header { display: flex; align-items: center; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 3px solid #eee; }
+        .step-big-number { font-size: 2.5em; font-weight: 900; color: #667eea; opacity: 0.2; margin-right: 20px; line-height: 1; }
+        .step-header h2 { font-size: 1.8em; color: #333; }
+
+        /* --- INTERACTIVE DEMO (DRAG & DROP) --- */
+        .interactive-demo { background: #f8f9fa; padding: 30px; border-radius: 15px; margin: 40px 0; border: 3px solid #e7e7e9; }
+        .demo-title { text-align: center; color: #667eea; margin-bottom: 25px; }
+        .course-pool { background: #e2e8f0; padding: 20px; border-radius: 12px; margin-bottom: 30px; min-height: 120px; }
+        .pool-label { font-weight: bold; color: #4a5568; margin-bottom: 15px; text-transform: uppercase; font-size: 0.9em; letter-spacing: 1px; }
+        
+        .ranking-buckets { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+        .bucket { background: white; border-radius: 12px; padding: 15px; border: 3px dashed #cbd5e0; transition: all 0.3s; display: flex; flex-direction: column; }
+        .bucket.drag-over { background: #ebf8ff; border-color: #667eea; border-style: solid; transform: scale(1.02); }
+        .bucket-header { font-weight: bold; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #eee; }
+        .bucket.favorite { border-color: #f6e05e; background: #fffff0; }
+        .bucket-limit { display: block; font-size: 0.8em; color: #718096; font-weight: normal; margin-top: 5px; }
+        .bucket-content { flex: 1; min-height: 100px; }
+        .empty-bucket-msg { color: #a0aec0; font-style: italic; text-align: center; padding-top: 30px; font-size: 0.9em; }
+
+        .course-item { 
+            background: white; border: 1px solid #e2e8f0; padding: 12px 15px; margin-bottom: 10px; border-radius: 8px; 
+            cursor: grab; box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: all 0.2s;
+        }
+        .course-item:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); border-color: #667eea; }
+        .course-item.dragging { opacity: 0.5; cursor: grabbing; }
+        .course-name { font-weight: 700; color: #2d3748; }
+        .course-code { font-size: 0.85em; color: #718096; margin-top: 4px; }
+
+        .demo-controls { display: flex; justify-content: center; gap: 15px; margin-top: 30px; }
+        .btn-demo { padding: 10px 25px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; transition: all 0.2s; }
+        .btn-check { background: #667eea; color: white; }
+        .btn-check:hover { background: #5a6fd6; }
+        .btn-reset { background: #edf2f7; color: #4a5568; }
+        .btn-reset:hover { background: #e2e8f0; }
+
+        .demo-feedback { margin-top: 25px; padding: 20px; border-radius: 10px; display: none; animation: slideDown 0.3s ease; }
+        .demo-feedback.show { display: block; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        .feedback-good { background: #d4edda; border: 2px solid #28a745; color: #155724; }
+        .feedback-bad { background: #fff3cd; border: 2px solid #ffc107; color: #856404; }
+
+        /* --- CHATBOT --- */
+        .chatbot-toggle {
+            position: fixed; bottom: 30px; right: 30px; width: 65px; height: 65px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%; cursor: pointer; box-shadow: 0 5px 25px rgba(102, 126, 234, 0.5);
+            display: flex; align-items: center; justify-content: center; font-size: 30px; color: white;
+            transition: all 0.3s; z-index: 1000; border: none;
+        }
+        .chatbot-toggle:hover { transform: scale(1.1) rotate(-10deg); }
+        .chat-window {
+            position: fixed; bottom: 100px; right: 30px; width: 380px; height: 550px;
+            background: white; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            display: none; flex-direction: column; overflow: hidden; z-index: 1001;
+            animation: slideInRight 0.3s ease;
+        }
+        @keyframes slideInRight { from { opacity: 0; transform: translateX(50px); } to { opacity: 1; transform: translateX(0); } }
+        .chat-window.active { display: flex; }
+        .chat-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .chat-body { flex: 1; background: #f8f9fa; padding: 20px; overflow-y: auto; }
+        .chat-footer { padding: 15px; background: white; border-top: 1px solid #eee; display: flex; gap: 10px; }
+        .chat-input { flex: 1; padding: 12px 15px; border: 2px solid #eee; border-radius: 25px; outline: none; transition: all 0.3s; }
+        .chat-input:focus { border-color: #667eea; }
+        .chat-send { width: 45px; height: 45px; border-radius: 50%; background: #667eea; color: white; border: none; cursor: pointer; flex-shrink: 0; }
+
+        .message { margin-bottom: 15px; display: flex; align-items: flex-end; gap: 8px; }
+        .message.user { flex-direction: row-reverse; }
+        .msg-bubble { max-width: 80%; padding: 12px 16px; border-radius: 18px; line-height: 1.4; font-size: 0.95em; }
+        .bot .msg-bubble { background: white; border: 1px solid #eee; border-bottom-left-radius: 4px; color: #333; }
+        .user .msg-bubble { background: #667eea; color: white; border-bottom-right-radius: 4px; }
+        .bot-avatar { width: 30px; height: 30px; background: #764ba2; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; color: white; flex-shrink: 0; }
+        
+        .quick-replies { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 15px; }
+        .quick-reply-btn { background: #eef2ff; color: #667eea; border: 1px solid #667eea; padding: 6px 12px; border-radius: 15px; font-size: 0.85em; cursor: pointer; transition: all 0.2s; }
+        .quick-reply-btn:hover { background: #667eea; color: white; }
+
+        /* --- RESPONSIVE --- */
+        @media (max-width: 768px) {
+            .content-body, header { padding: 30px 20px; }
+            h1 { font-size: 2em; }
+            .chat-window { width: calc(100% - 40px); right: 20px; bottom: 20px; height: 60vh; }
+            .chatbot-toggle { bottom: 20px; right: 20px; }
+            .step-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+            .step-big-number { margin: 0; font-size: 2em; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="page1" class="page active">
+        <div class="main-container">
+            <header>
+                <h1>🎓 Mastering Cognomos</h1>
+                <p class="subtitle">Technical Readiness Check</p>
+            </header>
+            
+            <div class="content-body">
+                <div class="info-box alert-box">
+                    <h3>🚧 Stop & Check Access</h3>
+                    <p>Before learning <em>how</em> to rank, you must ensure you <em>can</em> rank. If the live system is active, please verify your access now. If you cannot see courses, the tutorial will not be helpful.</p>
+                </div>
+
+                <div class="troubleshooting-steps">
+                    <h3 style="margin-bottom: 20px; color: #444;">Troubleshooting Connection Issues:</h3>
+                    <div class="step-item">
+                        <div class="step-badge">1</div>
+                        <div class="step-text">Switch to <strong>Incognito/Private</strong> mode in your browser.</div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-badge">2</div>
+                        <div class="step-text">Try a different network (e.g., disconnect from WiFi and use mobile data temporarily to test).</div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-badge">3</div>
+                        <div class="step-text">Ensure you are using the official link below.</div>
+                    </div>
+                </div>
+
+                <div style="text-align: center; margin: 30px 0;">
+                    <a href="https://coursematch.gsb.columbia.edu" target="_blank" style="background: #f0f4ff; padding: 15px 30px; border-radius: 30px; color: #667eea; text-decoration: none; font-weight: bold; display: inline-block; border: 2px solid #667eea;">
+                        🔗 Open Course Match in New Tab
+                    </a>
+                </div>
+
+                <label class="readiness-check">
+                    <input type="checkbox" id="readinessCheckbox">
+                    <span>I have verified that I can access Course Match and see the course list.</span>
+                </label>
+
+                <div class="nav-container">
+                    <button id="startTutorialBtn" class="nav-btn" disabled onclick="navigateTo('page2')">
+                        Continue to Tutorial →
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="page2" class="page">
+        <div class="main-container">
+            <header class="header-section">
+                <h1>📘 Course Match Guide</h1>
+                <p class="subtitle">Understanding the Algorithm & Ranking Strategy</p>
+            </header>
+
+            <div class="content-body">
+                <div class="info-box tip-box">
+                    <h3>💡 What is Course Match?</h3>
+                    <p>It is a fair allocation algorithm based on Nobel Prize-winning market design theory. Unlike first-come-first-served systems, everyone registers simultaneously, and the system assigns seats to maximize overall student satisfaction based on reported preferences.</p>
+                </div>
+
+                <div class="tutorial-step">
+                    <div class="step-header">
+                        <div class="step-big-number">01</div>
+                        <h2>Select More Courses Than You Need</h2>
+                    </div>
+                    <p><strong>This is the #1 mistake students make.</strong> If you need 4 courses, do not just rank 4 courses. The algorithm needs flexibility.</p>
+                    <p style="margin-top: 10px;">You should rank <strong>2x to 4x</strong> the number of credits you actually plan to take. This doesn't lower your chances for your top picks; it just ensures you get <em>something</em> decent if your top picks are full.</p>
+                </div>
+
+                <div class="tutorial-step">
+                    <div class="step-header">
+                        <div class="step-big-number">02</div>
+                        <h2>Rank Honestly Using Buckets</h2>
+                    </div>
+                    <p>Don't try to game the system. The best strategy is to be honest about what you want. Drag courses into buckets based on how much you actually want them.</p>
+                    
+                    <div class="interactive-demo">
+                        <h3 class="demo-title">🎯 Practice: Drag & Drop Ranking</h3>
+                        
+                        <div class="pool-label">Available Course Pool (Drag these)</div>
+                        <div class="course-pool" id="coursePool">
+                            <div class="course-item" draggable="true" data-id="c1">
+                                <div class="course-name">Corporate Finance</div>
+                                <div class="course-code">FIN 301 • MW 10:00am</div>
+                            </div>
+                            <div class="course-item" draggable="true" data-id="c2">
+                                <div class="course-name">Digital Marketing Strategy</div>
+                                <div class="course-code">MKT 450 • TR 2:00pm</div>
+                            </div>
+                            <div class="course-item" draggable="true" data-id="c3">
+                                <div class="course-name">Data Analytics for Leaders</div>
+                                <div class="course-code">OPS 320 • MW 4:00pm</div>
+                            </div>
+                            <div class="course-item" draggable="true" data-id="c4">
+                                <div class="course-name">Negotiations</div>
+                                <div class="course-code">MGT 510 • F 9:00am</div>
+                            </div>
+                            <div class="course-item" draggable="true" data-id="c5">
+                                <div class="course-name">Investment Banking</div>
+                                <div class="course-code">FIN 440 • TR 10:00am</div>
+                            </div>
+                        </div>
+
+                        <div class="ranking-buckets">
+                            <div class="bucket favorite" data-type="favorite">
+                                <div class="bucket-header">⭐ Favorite <span class="bucket-limit">(Max 1 Course)</span></div>
+                                <div class="bucket-content">
+                                    <div class="empty-bucket-msg">Drop your #1 pick here</div>
+                                </div>
+                            </div>
+                            <div class="bucket" data-type="great">
+                                <div class="bucket-header">✨ Great <span class="bucket-limit">(Unlimited)</span></div>
+                                <div class="bucket-content">
+                                    <div class="empty-bucket-msg">Courses you really want</div>
+                                </div>
+                            </div>
+                            <div class="bucket" data-type="good">
+                                <div class="bucket-header">👍 Good <span class="bucket-limit">(Unlimited)</span></div>
+                                <div class="bucket-content">
+                                    <div class="empty-bucket-msg">Solid backup options</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="demo-controls">
+                            <button class="btn-demo btn-check" onclick="checkDemoRankings()">Analyze My Rankings</button>
+                            <button class="btn-demo btn-reset" onclick="resetDemo()">Reset</button>
+                        </div>
+
+                        <div id="demoFeedback" class="demo-feedback"></div>
+                    </div>
+                    </div>
+
+                <div class="tutorial-step">
+                    <div class="step-header">
+                        <div class="step-big-number">03</div>
+                        <h2>Review & Submit</h2>
+                    </div>
+                    <p>Before the deadline, check your <strong>Preview Schedules</strong>. The system will show you potential outcomes based on current demand.</p>
+                    <div class="info-box warning-box">
+                        <h3>⚠️ Important</h3>
+                        <p>If you see preview schedules that you hate, you need to change your rankings! Add more "Good" or "Acceptable" courses until the previews look okay.</p>
+                    </div>
+                </div>
+
+                <div class="nav-container">
+                    <button class="nav-btn secondary" onclick="navigateTo('page1')">← Back to Start</button>
+                    <button class="nav-btn" onclick="window.scrollTo(0,0); alert('You have completed the tutorial! Good luck with your rankings.')">Finish Tutorial 🎉</button>
+                </div>
+            </div>
+        </div>
+
+        <button id="chatToggle" class="chatbot-toggle">💬</button>
+        <div id="chatWindow" class="chat-window">
+            <div class="chat-header">
+                <h3>Course Match Assistant</h3>
+                <button onclick="toggleChat()" style="background:none;border:none;color:white;font-size:24px;cursor:pointer;">×</button>
+            </div>
+            <div class="chat-body" id="chatBody">
+                <div class="message bot">
+                    <div class="bot-avatar">🤖</div>
+                    <div class="msg-bubble">
+                        Hi! I can help with Course Match questions. Try asking:
+                        <div class="quick-replies">
+                            <button class="quick-reply-btn" onclick="sendQuickReply('How many courses should I rank?')">How many to rank?</button>
+                            <button class="quick-reply-btn" onclick="sendQuickReply('What goes in Favorite?')">Favorite bucket?</button>
+                            <button class="quick-reply-btn" onclick="sendQuickReply('Can I change rankings?')">Can I change rankings?</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="chat-footer">
+                <input type="text" id="chatInput" class="chat-input" placeholder="Type your question...">
+                <button class="chat-send" onclick="handleUserChat()">➤</button>
+            </div>
+        </div>
+
+    </div> <script>
+        /* --- NAVIGATION LOGIC --- */
+        function navigateTo(pageId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+            window.scrollTo(0, 0);
+        }
+
+        // Page 1 Readiness Check
+        const readinessCheckbox = document.getElementById('readinessCheckbox');
+        const startTutorialBtn = document.getElementById('startTutorialBtn');
+        if(readinessCheckbox) {
+            readinessCheckbox.addEventListener('change', (e) => {
+                startTutorialBtn.disabled = !e.target.checked;
+            });
+        }
+
+        /* --- INTERACTIVE DEMO LOGIC --- */
+        let draggedItem = null;
+        const courseItems = document.querySelectorAll('.course-item');
+        const buckets = document.querySelectorAll('.bucket');
+        const coursePool = document.getElementById('coursePool');
+
+        // Drag Start
+        courseItems.forEach(item => {
+            item.addEventListener('dragstart', function() {
+                draggedItem = this;
+                setTimeout(() => this.classList.add('dragging'), 0);
+            });
+            item.addEventListener('dragend', function() {
+                this.classList.remove('dragging');
+                checkEmptyBuckets();
+            });
+        });
+
+        // Drag Over / Drop for Buckets & Pool
+        [...buckets, coursePool].forEach(container => {
+            container.addEventListener('dragover', e => {
+                e.preventDefault();
+                if (container.classList.contains('bucket')) container.classList.add('drag-over');
+            });
+            container.addEventListener('dragleave', e => {
+                if (container.classList.contains('bucket')) container.classList.remove('drag-over');
+            });
+            container.addEventListener('drop', e => {
+                e.preventDefault();
+                if (container.classList.contains('bucket')) container.classList.remove('drag-over');
+                
+                // Logic for Favorite bucket limit (max 1)
+                if (container.dataset.type === 'favorite' && container.querySelectorAll('.course-item').length > 0) {
+                    // If dropping into full favorite, swap items
+                    const existingItem = container.querySelector('.course-item');
+                    coursePool.appendChild(existingItem);
+                }
+                
+                // If dropping into a bucket, append to its content area
+                if (container.classList.contains('bucket')) {
+                    container.querySelector('.bucket-content').appendChild(draggedItem);
+                } else {
+                    // Dropping back to pool
+                    container.appendChild(draggedItem);
+                }
+                checkEmptyBuckets();
+                document.getElementById('demoFeedback').classList.remove('show'); // Hide previous feedback on new move
+            });
+        });
+
+        function checkEmptyBuckets() {
+            document.querySelectorAll('.bucket-content').forEach(content => {
+                const hasItems = content.querySelectorAll('.course-item').length > 0;
+                const msg = content.querySelector('.empty-bucket-msg');
+                if (hasItems && msg) msg.style.display = 'none';
+                else if (!hasItems && msg) msg.style.display = 'block';
+            });
+        }
+
+        function checkDemoRankings() {
+            const favCount = document.querySelector('.bucket[data-type="favorite"] .course-item').length || 0; // Fix: querySelectorAll needed for length, but we know max is 1, so just check existence
+             // Actually let's use querySelectorAll to be safe
+            const favItems = document.querySelectorAll('.bucket[data-type="favorite"] .course-item').length;
+            const totalRanked = document.querySelectorAll('.bucket .course-item').length;
+            const feedback = document.getElementById('demoFeedback');
+            
+            let msg = "";
+            let isGood = false;
+
+            if (totalRanked === 0) {
+                msg = "❌ <strong>Nothing ranked!</strong> Drag some courses into the buckets first.";
+            } else if (favItems === 0) {
+                msg = "⚠️ <strong>Missing Favorite!</strong> You must have exactly one course in the Favorite bucket. It's your most important choice.";
+            } else if (totalRanked < 3) {
+                msg = "⚠️ <strong>Not enough options.</strong> You only ranked " + totalRanked + " courses. The algorithm needs more alternatives to find you a good schedule.";
+            } else {
+                msg = "✅ <strong>Great job!</strong> You have a favorite selected and multiple backup options. This gives the algorithm the flexibility it needs.";
+                isGood = true;
+            }
+
+            feedback.innerHTML = msg;
+            feedback.className = 'demo-feedback show ' + (isGood ? 'feedback-good' : 'feedback-bad');
+        }
+
+        function resetDemo() {
+            document.querySelectorAll('.bucket .course-item').forEach(item => {
+                coursePool.appendChild(item);
+            });
+            checkEmptyBuckets();
+            document.getElementById('demoFeedback').classList.remove('show');
+        }
+
+        /* --- CHATBOT LOGIC --- */
+        const chatWindow = document.getElementById('chatWindow');
+        const chatBody = document.getElementById('chatBody');
+        const chatInput = document.getElementById('chatInput');
+        const chatToggle = document.getElementById('chatToggle');
+
+        function toggleChat() {
+            chatWindow.classList.toggle('active');
+        }
+        chatToggle.addEventListener('click', toggleChat);
+
+        // Simple Keyword-based Responses
+        const botResponses = {
+            'how many': "Rank 2x-4x the credits you need. If you need 4 classes, rank 8-16!",
+            'favorite': "Only ONE course goes in Favorite. It has the highest priority weight (~10,000 utility points).",
+            'change': "Yes, you can change rankings as many times as you want until the deadline passes.",
+            'deadline': "Check the official academic calendar for this term's specific deadline.",
+            'strategy': "Don't game it! Just be honest. Ranking honestly is mathematically proven to be your best strategy in this specific algorithm.",
+            'default': "I'm not sure about that yet. Try asking about 'how many courses to rank' or 'favorite bucket'."
+        };
+
+        function addMessage(text, sender) {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `message ${sender}`;
+            msgDiv.innerHTML = sender === 'bot' ? `<div class="bot-avatar">🤖</div><div class="msg-bubble">${text}</div>` : `<div class="msg-bubble">${text}</div>`;
+            chatBody.appendChild(msgDiv);
+            chatBody.scrollTop = chatBody.scrollHeight;
+        }
+
+        function getBotResponse(text) {
+            text = text.toLowerCase();
+            for (let key in botResponses) {
+                if (text.includes(key)) return botResponses[key];
+            }
+            return botResponses['default'];
+        }
+
+        function handleUserChat() {
+            const text = chatInput.value.trim();
+            if (!text) return;
+            addMessage(text, 'user');
+            chatInput.value = '';
+            setTimeout(() => {
+                addMessage(getBotResponse(text), 'bot');
+            }, 500);
+        }
+
+        function sendQuickReply(text) {
+            addMessage(text, 'user');
+            setTimeout(() => {
+                addMessage(getBotResponse(text), 'bot');
+            }, 500);
+        }
+
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') handleUserChat();
+        });
+
+        // Initial setup for demo buckets
+        checkEmptyBuckets();
+    </script>
+</body>
+</html>
