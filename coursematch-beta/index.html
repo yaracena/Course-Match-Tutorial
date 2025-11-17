@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Match Information Webpage - Beta</title>
+    <meta name="description" content="Unofficial guide to help Columbia Business School students navigate the Course Match system. Beta version - use at your own discretion.">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .welcome-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 600px;
+            width: 100%;
+            overflow: hidden;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 50px 40px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            opacity: 0.95;
+            line-height: 1.5;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .disclaimer-box {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            color: #856404;
+        }
+
+        .disclaimer-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .disclaimer-text {
+            font-size: 0.95em;
+            line-height: 1.5;
+        }
+
+        .beta-badge {
+            display: inline-block;
+            background: #dc3545;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .description {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .option-card {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 25px;
+            transition: all 0.3s;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .option-card:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.2);
+        }
+
+        .option-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .option-description {
+            color: #666;
+            line-height: 1.5;
+        }
+
+        .emoji {
+            font-size: 1.5em;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 30px;
+            color: #666;
+            font-size: 0.9em;
+            border-top: 1px solid #eee;
+        }
+
+        .feedback-link {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .feedback-link:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 2em; }
+            .header { padding: 40px 30px; }
+            .content { padding: 30px; }
+            .option-title { font-size: 1.1em; }
+            
+            /* Better mobile layout */
+            .options {
+                gap: 20px;
+            }
+            
+            .option-card {
+                padding: 20px;
+                margin: 0;
+            }
+            
+            /* Ensure footer doesn't interfere with content */
+            .footer {
+                padding: 25px 20px;
+                margin-top: 40px;
+            }
+            
+            /* Fix any chat button issues */
+            .chat-button {
+                bottom: 80px !important;
+                right: 15px !important;
+                z-index: 9999 !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="welcome-container">
+        <header class="header">
+            <h1>📚 Course Match Information Webpage</h1>
+            <p class="subtitle">Unofficial Columbia Business School Registration Guide</p>
+        </header>
+        
+        <div class="content">
+            <span class="beta-badge">⚠️ UNOFFICIAL BETA VERSION</span>
+            
+            <div class="disclaimer-box">
+                <div class="disclaimer-title">
+                    <span>⚠️</span>
+                    Important Disclaimer
+                </div>
+                <div class="disclaimer-text">
+                    This is an <strong>unofficial</strong> resource created by administrators to help students navigate Course Match. While we strive for accuracy, information may be subject to change. Always verify important details with official CBS sources. This guide is provided for educational purposes.
+                </div>
+            </div>
+            
+            <p class="description">
+                This tool aims to help Columbia Business School students better understand the Course Match registration process through interactive tutorials and troubleshooting guides.
+            </p>
+            
+            <div class="options">
+                <a href="readiness-check.html" class="option-card">
+                    <div class="option-title">
+                        <span class="emoji">🚦</span>
+                        Start Here: Readiness Check
+                    </div>
+                    <div class="option-description">
+                        First-time users should start here. Verify you can access Course Match and troubleshoot common technical issues before proceeding to the tutorial.
+                    </div>
+                </a>
+                
+                <a href="tutorial.html" class="option-card">
+                    <div class="option-title">
+                        <span class="emoji">🎓</span>
+                        Interactive Tutorial
+                    </div>
+                    <div class="option-description">
+                        Learn the Course Match system through interactive FAQs, quizzes, and strategies. Includes a helpful chatbot assistant for quick questions.
+                    </div>
+                </a>
+            </div>
+        </div>
+        
+        <footer class="footer">
+            <p><strong>Unofficial Resource</strong> - Based on official guide by CBS Office of Records and Registration</p>
+            <p style="margin-top: 10px;">
+                <a href="mailto:coursematch@gsb.columbia.edu" class="feedback-link">Questions or Issues? Contact the Team</a>
+            </p>
+            <p style="margin-top: 10px; font-size: 0.85em; color: #999;">
+                Created by administrators to help students navigate Course Match. For educational purposes only.
+            </p>
+        </footer>
+    </div>
+</body>
+</html>

@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Match Historical Data - Fall 2024 & Spring 2025</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+            color: #1a1a1a;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .modal h3 {
+            color: #34495e;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        .example-box {
+            background: #e8f4f8;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+
+        .example-title {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .ratio-breakdown {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .understand-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            display: block;
+            margin: 30px auto 0;
+            transition: all 0.3s ease;
+        }
+
+        .understand-btn:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Rest of existing styles */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        /* Term Selector */
+        .term-selector {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .term-btn {
+            padding: 12px 30px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .term-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .term-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        /* Ticker Container */
+        .ticker-container {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .ticker-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .ticker-wrapper {
+            overflow: hidden;
+            position: relative;
+        }
+
+        .ticker-content {
+            display: flex;
+            animation: scroll 45s linear infinite;
+        }
+
+        @keyframes scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        .ticker-item {
+            flex-shrink: 0;
+            padding: 0 30px;
+            white-space: nowrap;
+        }
+
+        .course-code {
+            font-weight: bold;
+            color: #ffd700;
+        }
+
+        .demand-ratio {
+            background: rgba(255,255,255,0.2);
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.9em;
+        }
+
+        /* Term Content */
+        .term-content {
+            display: none;
+        }
+
+        .term-content.active {
+            display: block;
+        }
+
+        /* Data Grid */
+        .data-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .data-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .data-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .data-card h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .icon {
+            font-size: 1.5em;
+        }
+
+        .course-list {
+            list-style: none;
+        }
+
+        .course-list li {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.3s ease;
+        }
+
+        .course-list li:hover {
+            background: #f8f9fa;
+        }
+
+        .course-list li:last-child {
+            border-bottom: none;
+        }
+
+        .course-info {
+            flex: 1;
+        }
+
+        .course-name {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .course-stats {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: bold;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .badge-high {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .badge-medium {
+            background: #f39c12;
+            color: white;
+        }
+
+        .badge-low {
+            background: #3498db;
+            color: white;
+        }
+
+        .badge-success {
+            background: #27ae60;
+            color: white;
+        }
+
+        /* Info Boxes */
+        .info-box {
+            background: #e8f4f8;
+            border-left: 4px solid #3498db;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .info-box h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .info-box p {
+            color: #34495e;
+            margin-bottom: 10px;
+        }
+
+        /* Insights Section */
+        .insights-section {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .insights-section h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        .insight {
+            padding: 15px;
+            margin-bottom: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .insight-title {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        /* Comparison Section */
+        .comparison-section {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .comparison-card {
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 30px 0;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        /* Home Button */
+        .home-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #667eea;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 50px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .home-btn:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+            box-shadow: 0 7px 20px rgba(0,0,0,0.4);
+        }
+    </style>
+</head>
+<body>
+    <!-- Understanding Ratios Modal -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <h2>📊 Understanding Course Demand Ratios</h2>
+            
+            <p>Before viewing the course data, it's important to understand what these numbers mean:</p>
+            
+            <div class="example-box">
+                <div class="example-title">Example: Applied Value Investing</div>
+                <div>121 students wanted this course</div>
+                <div>Only 10 seats were available</div>
+                <div><strong>Demand Ratio = 12.1:1</strong></div>
+            </div>
+            
+            <h3>What does 12.1:1 mean?</h3>
+            <p>For every 1 seat available, 12.1 students wanted it. In other words, roughly 12 students competed for each seat.</p>
+            
+            <div class="ratio-breakdown">
+                <h4>How to interpret demand ratios:</h4>
+                <ul>
+                    <li><strong>10:1 or higher</strong> = Extremely competitive (only ~10% get in)</li>
+                    <li><strong>5:1 to 10:1</strong> = Very competitive (10-20% get in)</li>
+                    <li><strong>2:1 to 5:1</strong> = Moderately competitive (20-50% get in)</li>
+                    <li><strong>Under 2:1</strong> = Good odds (50%+ get in)</li>
+                </ul>
+            </div>
+            
+            <h3>Why this matters:</h3>
+            <p>When you see a course with a 12:1 ratio marked as "Favorite" by 50% of students, you understand that:</p>
+            <ul>
+                <li>It's extremely competitive</li>
+                <li>Most students who rank it won't get in</li>
+                <li>Using your Favorite bucket here is a big gamble</li>
+                <li>You need strong alternatives in other buckets</li>
+            </ul>
+            
+            <p style="margin-top: 20px; text-align: center; font-weight: bold;">
+                Use this data to make informed, strategic ranking decisions!
+            </p>
+            
+            <button class="understand-btn" onclick="closeModal()">I Understand - Show Me the Data</button>
+        </div>
+    </div>
+
+    <!-- Main Content (Hidden Initially) -->
+    <div class="container hidden" id="mainContent">
+        <h1>📊 Course Match Historical Data Insights</h1>
+        <p class="subtitle">Reference data from CBS Office of Records and Registration</p>
+
+        <!-- Term Selector -->
+        <div class="term-selector">
+            <button class="term-btn active" onclick="showTerm('spring2025')">Spring 2025</button>
+            <button class="term-btn" onclick="showTerm('fall2024')">Fall 2024</button>
+        </div>
+
+        <!-- Spring 2025 Content -->
+        <div id="spring2025" class="term-content active">
+            <!-- Spring 2025 Ticker -->
+            <div class="ticker-container">
+                <div class="ticker-title">📈 HIGHLY RANKED COURSES - SPRING 2025 📈</div>
+                <div class="ticker-wrapper">
+                    <div class="ticker-content" id="tickerContentSpring">
+                        <!-- Spring ticker items will be inserted here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Spring 2025 Data Grid -->
+            <div class="data-grid">
+                <div class="data-card">
+                    <h2><span class="icon">🌸</span> Most Highly Ranked - Spring 2025</h2>
+                    <ul class="course-list" id="popularListSpring">
+                        <!-- Spring popular courses will be inserted here -->
+                    </ul>
+                </div>
+
+                <div class="data-card">
+                    <h2><span class="icon">📈</span> High Success Rates - Spring 2025</h2>
+                    <ul class="course-list" id="successListSpring">
+                        <!-- Spring success courses will be inserted here -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fall 2024 Content -->
+        <div id="fall2024" class="term-content">
+            <!-- Fall 2024 Ticker -->
+            <div class="ticker-container">
+                <div class="ticker-title">📈 HIGHLY RANKED COURSES - FALL 2024 📈</div>
+                <div class="ticker-wrapper">
+                    <div class="ticker-content" id="tickerContentFall">
+                        <!-- Fall ticker items will be inserted here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fall 2024 Data Grid -->
+            <div class="data-grid">
+                <div class="data-card">
+                    <h2><span class="icon">🍂</span> Most Highly Ranked - Fall 2024</h2>
+                    <ul class="course-list" id="popularListFall">
+                        <!-- Fall popular courses will be inserted here -->
+                    </ul>
+                </div>
+
+                <div class="data-card">
+                    <h2><span class="icon">📈</span> High Success Rates - Fall 2024</h2>
+                    <ul class="course-list" id="successListFall">
+                        <!-- Fall success courses will be inserted here -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Info Box -->
+        <div class="info-box">
+            <h3>📌 Understanding the Data</h3>
+            <p><strong>Demand Ratio:</strong> Number of students who ranked the course ÷ available seats (e.g., 10:1 means 10 students wanted each seat)</p>
+            <p><strong>Success Rate:</strong> Percentage of students who ranked the course and were enrolled</p>
+            <p><strong>Marked as Favorite:</strong> Percentage of students who placed the course in their Favorite bucket</p>
+            <p style="margin-top: 10px;">This historical data can help you understand course popularity patterns and inform your ranking strategy.</p>
+        </div>
+
+        <!-- Comparison Section -->
+        <div class="comparison-section">
+            <h2>📊 Key Patterns Across Terms</h2>
+            
+            <div class="comparison-grid">
+                <div class="comparison-card">
+                    <h4>🍂 Fall Term Characteristics</h4>
+                    <ul>
+                        <li>Different mix of courses than Spring term</li>
+                        <li>Popular courses: Applied Value Investing, Premium Brand Strategy</li>
+                        <li>High demand for entrepreneurship courses</li>
+                        <li>Python for MBAs has good success rate (77%)</li>
+                    </ul>
+                </div>
+                
+                <div class="comparison-card">
+                    <h4>🌸 Spring Term Characteristics</h4>
+                    <ul>
+                        <li>More Global Immersion Programs (GIPs)</li>
+                        <li>Personal Finance extremely popular (528 students)</li>
+                        <li>Multiple GIPs with 200+ students interested</li>
+                        <li>Capital Markets has high capacity (587 seats)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Insights Section -->
+        <div class="insights-section">
+            <h2>🔍 Strategic Insights</h2>
+            
+            <div class="insight">
+                <div class="insight-title">Consistently Popular Courses</div>
+                <div>Applied Value Investing appears in both terms with 12:1+ demand ratios. Premium Brand Strategy and Entrepreneurship Through Acquisition also show high demand across terms.</div>
+            </div>
+
+            <div class="insight">
+                <div class="insight-title">Term-Specific Opportunities</div>
+                <div>Global Immersion Programs are primarily offered in Spring. Courses like Managerial Negotiations have multiple sections across terms.</div>
+            </div>
+
+            <div class="insight">
+                <div class="insight-title">Success Rate Patterns</div>
+                <div>Technical courses (Python, Databases) often have better success rates. Large capacity courses (300+ seats) typically have 60%+ success rates.</div>
+            </div>
+
+            <div class="insight">
+                <div class="insight-title">Strategic Ranking Approach</div>
+                <div>Courses marked as Favorite by 80%+ of students who rank them are extremely competitive. Consider your personal priorities when ranking these courses.</div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Data source: CBS Office of Records and Registration</p>
+            <p>Historical Course Match Results from Fall 2024 and Spring 2025</p>
+            <p style="margin-top: 10px;"><strong>This is an unofficial educational resource</strong></p>
+            <p>Course Match is property of Columbia Business School</p>
+            <p style="margin-top: 10px;">Questions? <a href="mailto:coursematch@gsb.columbia.edu" style="color: #667eea;">coursematch@gsb.columbia.edu</a></p>
+        </div>
+    </div>
+
+    <a href="index.html" class="home-btn">
+        🏠 Back to Tutorial
+    </a>
+
+    <script>
+        // Modal Functions
+        function closeModal() {
+            document.getElementById('modalOverlay').style.display = 'none';
+            document.getElementById('mainContent').classList.remove('hidden');
+        }
+
+        // Prevent closing modal by clicking outside
+        document.getElementById('modalOverlay').addEventListener('click', function(e) {
+            if (e.target === this) {
+                e.preventDefault();
+            }
+        });
+
+        // Course data for both terms
+        const courseData = {
+            spring2025: {
+                highly_ranked: [
+                    { code: 'FINCB8373', name: 'Applied Value Investing', ratio: '12.1:1', students: 121, seats: 10, favorite: 50.0 },
+                    { code: 'FINCB8354', name: 'Personal Finance', ratio: '10.8:1', students: 528, seats: 49, favorite: 78.6 },
+                    { code: 'BUSIB8772', name: 'GIP: Rwanda', ratio: '9.6:1', students: 279, seats: 29, favorite: 46.8 },
+                    { code: 'BUSIB8708', name: 'GIP: Tech in Africa', ratio: '9.1:1', students: 264, seats: 29, favorite: 61.4 },
+                    { code: 'BUSIB8777', name: 'GIP: Philippines', ratio: '8.4:1', students: 252, seats: 30, favorite: 60.5 },
+                    { code: 'MRKTB8612', name: 'Premium Brand Strategy', ratio: '7.4:1', students: 223, seats: 30, favorite: 100.0 },
+                    { code: 'BUSIB8778', name: 'GIP: South Africa', ratio: '7.1:1', students: 206, seats: 29, favorite: 91.7 },
+                    { code: 'MRKTB8648', name: 'Marketing of an American President', ratio: '6.1:1', students: 243, seats: 40, favorite: 90.0 },
+                    { code: 'BUECB8498', name: 'M&A in Media & Tech', ratio: '5.9:1', students: 214, seats: 36, favorite: 85.7 },
+                    { code: 'MGMTB8523', name: 'Entrepreneurship Through Acquisition', ratio: '5.7:1', students: 425, seats: 74, favorite: 86.8 }
+                ],
+                high_success: [
+                    { code: 'FINCB8306', name: 'Capital Markets & Investments', rate: '85.1%', enrolled: 428, ranked: 503 },
+                    { code: 'FINCB8369', name: 'Applied Security Analysis I', rate: '71.6%', enrolled: 73, ranked: 102 },
+                    { code: 'FINCB8331', name: 'Real Estate Finance', rate: '68.2%', enrolled: 152, ranked: 223 },
+                    { code: 'DROMB8128', name: 'Healthcare VC & PE', rate: '68.0%', enrolled: 70, ranked: 103 },
+                    { code: 'MGMTB8518', name: 'Foundations of Entrepreneurship', rate: '64.4%', enrolled: 152, ranked: 236 },
+                    { code: 'MRKTB8568', name: 'Branding in the Arts', rate: '61.9%', enrolled: 65, ranked: 105 },
+                    { code: 'DROMB8106', name: 'Operations Strategy', rate: '61.8%', enrolled: 325, ranked: 526 },
+                    { code: 'BUECB8216', name: 'Economics of Strategic Behavior', rate: '60.3%', enrolled: 155, ranked: 257 }
+                ]
+            },
+            fall2024: {
+                highly_ranked: [
+                    { code: 'FINCB8373', name: 'Applied Value Investing', ratio: '12.6:1', students: 126, seats: 10, favorite: 50.0 },
+                    { code: 'MRKTB8612', name: 'Premium Brand Strategy', ratio: '8.5:1', students: 256, seats: 30, favorite: 100.0 },
+                    { code: 'BUSIB8714', name: 'GIP: Brazil', ratio: '5.8:1', students: 168, seats: 29, favorite: 56.0 },
+                    { code: 'BUSIB8780', name: 'GIP: Egypt', ratio: '5.8:1', students: 167, seats: 29, favorite: 58.7 },
+                    { code: 'MGMTB8523', name: 'Entrepreneurship Through Acquisition', ratio: '4.8:1', students: 358, seats: 74, favorite: 92.9 },
+                    { code: 'MRKTB8609', name: 'Generative AI for Business', ratio: '4.5:1', students: 330, seats: 74, favorite: 100.0 },
+                    { code: 'FINCB8357', name: 'Activist Value Investing', ratio: '5.0:1', students: 129, seats: 26, favorite: 25.0 },
+                    { code: 'FINCB8401', name: 'Short Selling', ratio: '3.9:1', students: 139, seats: 36, favorite: 83.3 },
+                    { code: 'DROMB8146', name: 'Analytics in Action', ratio: '3.7:1', students: 88, seats: 24, favorite: 100.0 },
+                    { code: 'MGMTB8507', name: 'Organizational Change', ratio: '4.0:1', students: 541, seats: 136, favorite: 67.7 }
+                ],
+                high_success: [
+                    { code: 'DROMB8154', name: 'Python for MBAs', rate: '77.2%', enrolled: 105, ranked: 136 },
+                    { code: 'DROMB8138', name: 'Intro to Databases', rate: '75.9%', enrolled: 88, ranked: 116 },
+                    { code: 'BUSIB8705', name: 'Business & Climate Change', rate: '74.9%', enrolled: 206, ranked: 275 },
+                    { code: 'FINCB8307', name: 'Corporate Financial Mgmt', rate: '69.2%', enrolled: 72, ranked: 104 },
+                    { code: 'MRKTB8644', name: 'Sports Economics', rate: '67.0%', enrolled: 73, ranked: 109 },
+                    { code: 'MGMTB8510', name: 'Managerial Negotiations', rate: '65.5%', enrolled: 269, ranked: 411 },
+                    { code: 'FINCB8439', name: 'Foundations of VC', rate: '62.0%', enrolled: 228, ranked: 368 },
+                    { code: 'DROMB8107', name: 'Service Operations', rate: '61.4%', enrolled: 127, ranked: 207 }
+                ]
+            }
+        };
+
+        // Function to show selected term
+        function showTerm(term) {
+            // Update button states
+            document.querySelectorAll('.term-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Update content visibility
+            document.querySelectorAll('.term-content').forEach(content => content.classList.remove('active'));
+            document.getElementById(term).classList.add('active');
+        }
+
+        // Create ticker content
+        function createTicker(term, elementId) {
+            const tickerContent = document.getElementById(elementId);
+            let html = '';
+            
+            // Create two copies for seamless scrolling
+            for (let i = 0; i < 2; i++) {
+                courseData[term].highly_ranked.forEach(course => {
+                    html += `
+                        <span class="ticker-item">
+                            <span class="course-code">${course.code}</span>: ${course.name} 
+                            <span class="demand-ratio">${course.ratio} demand</span>
+                        </span>
+                    `;
+                });
+            }
+            
+            tickerContent.innerHTML = html;
+        }
+
+        // Create popular list
+        function createPopularList(term, elementId) {
+            const popularList = document.getElementById(elementId);
+            let html = '';
+            
+            courseData[term].highly_ranked.forEach(course => {
+                const ratio = parseFloat(course.ratio);
+                const badgeClass = ratio >= 10 ? 'badge-high' : 
+                                  ratio >= 7 ? 'badge-medium' : 'badge-low';
+                
+                html += `
+                    <li>
+                        <div class="course-info">
+                            <div class="course-name">${course.code}: ${course.name}</div>
+                            <div class="course-stats">${course.students} students → ${course.seats} seats | ${course.favorite}% favorite</div>
+                        </div>
+                        <span class="badge ${badgeClass}">${course.ratio}</span>
+                    </li>
+                `;
+            });
+            
+            popularList.innerHTML = html;
+        }
+
+        // Create success list
+        function createSuccessList(term, elementId) {
+            const successList = document.getElementById(elementId);
+            let html = '';
+            
+            courseData[term].high_success.forEach(course => {
+                html += `
+                    <li>
+                        <div class="course-info">
+                            <div class="course-name">${course.code}: ${course.name}</div>
+                            <div class="course-stats">${course.enrolled} of ${course.ranked} got in</div>
+                        </div>
+                        <span class="badge badge-success">${course.rate}</span>
+                    </li>
+                `;
+            });
+            
+            successList.innerHTML = html;
+        }
+
+        // Initialize all content
+        function initialize() {
+            // Spring 2025
+            createTicker('spring2025', 'tickerContentSpring');
+            createPopularList('spring2025', 'popularListSpring');
+            createSuccessList('spring2025', 'successListSpring');
+            
+            // Fall 2024
+            createTicker('fall2024', 'tickerContentFall');
+            createPopularList('fall2024', 'popularListFall');
+            createSuccessList('fall2024', 'successListFall');
+        }
+
+        // Run on load
+        initialize();
+    </script>
+</body>
+</html>

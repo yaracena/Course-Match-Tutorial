@@ -1,0 +1,1635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Tutorial - Course Match Information Webpage (Beta)</title>
+    <style>
+        /* --- GLOBAL RESETS & BASE STYLES --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        /* --- CONTAINERS --- */
+        .main-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            animation: fadeIn 0.5s ease;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- COMMON ELEMENTS --- */
+        .header-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 50px 40px;
+            text-align: center;
+        }
+        h1 { font-size: 2.5em; margin-bottom: 15px; text-shadow: 0 2px 10px rgba(0,0,0,0.2); }
+        .subtitle { font-size: 1.3em; opacity: 0.95; line-height: 1.5; }
+        .content-body { padding: 50px 40px; padding-bottom: 120px; }
+
+        /* --- PROGRESS BAR --- */
+        .progress-container {
+            background: #f0f0f0;
+            border-radius: 20px;
+            height: 8px;
+            margin: 30px 40px;
+            position: relative;
+        }
+        .progress-bar {
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            height: 100%;
+            border-radius: 20px;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        .progress-text {
+            text-align: center;
+            margin-top: 10px;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        /* --- FAQ CATEGORIES --- */
+        .category-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .category-tab {
+            padding: 12px 24px;
+            background: #f0f4ff;
+            border: 2px solid transparent;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            color: #667eea;
+        }
+        .category-tab:hover { background: #e5ecff; }
+        .category-tab.active { 
+            background: #667eea; 
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        /* --- FAQ ITEMS --- */
+        .faq-section {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        .faq-section.active { display: block; }
+        
+        .faq-item {
+            background: #f8f9fa;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s;
+        }
+        .faq-item:hover { border-color: #667eea; }
+        
+        .faq-question {
+            padding: 20px 25px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+        }
+        .faq-question:hover { background: #f0f4ff; }
+        
+        .faq-icon {
+            font-size: 1.2em;
+            color: #667eea;
+            transition: transform 0.3s;
+        }
+        .faq-item.expanded .faq-icon { transform: rotate(180deg); }
+        
+        .faq-answer {
+            padding: 0 25px;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            opacity: 0;
+        }
+        .faq-item.expanded .faq-answer {
+            padding: 20px 25px 25px;
+            max-height: 3000px;
+            opacity: 1;
+            overflow: visible;
+        }
+        .faq-answer p { line-height: 1.6; margin-bottom: 10px; }
+        .faq-answer ul { margin-left: 20px; margin-top: 10px; }
+        .faq-answer li { margin-bottom: 8px; }
+
+        /* --- INTERACTIVE ELEMENTS --- */
+        .try-it-box {
+            background: #f0f4ff;
+            border: 2px solid #667eea;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .try-it-box h4 {
+            color: #667eea;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .quiz-box {
+            background: #fff8e5;
+            border: 2px solid #ffc107;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 20px 0;
+            overflow: visible;
+            position: relative;
+        }
+        .quiz-box h4 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            color: #333;
+            line-height: 1.4;
+        }
+        .quiz-options {
+            margin-top: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .quiz-option {
+            background: white;
+            padding: 15px;
+            margin: 0;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 2px solid #e0e0e0;
+            transition: all 0.3s;
+            min-height: 48px;
+            display: flex;
+            align-items: center;
+        }
+        .quiz-option:hover { 
+            border-color: #ffc107;
+            transform: translateX(5px);
+        }
+        .quiz-option.correct { 
+            border-color: #28a745; 
+            background: #d4edda;
+            cursor: default;
+        }
+        .quiz-option.incorrect { 
+            border-color: #dc3545; 
+            background: #f8d7da;
+            cursor: default;
+        }
+        .quiz-feedback {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+        }
+        .quiz-feedback.show { display: block; }
+
+        /* --- NAVIGATION --- */
+        .nav-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+        }
+        .nav-btn {
+            padding: 8px 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+            border-radius: 20px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s;
+            color: white;
+            background: #667eea;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+            text-decoration: none;
+            display: inline-block;
+        }
+        .nav-btn:hover { 
+            transform: translateY(-1px); 
+            box-shadow: 0 3px 12px rgba(102, 126, 234, 0.3); 
+        }
+        .nav-btn.secondary { 
+            background: transparent;
+            color: #6c757d;
+            border: 1px solid #dee2e6;
+            box-shadow: none;
+            font-size: 0.85em;
+            padding: 6px 16px;
+        }
+        .nav-btn.secondary:hover { 
+            background: #f8f9fa;
+            border-color: #6c757d;
+            color: #495057;
+        }
+
+        /* --- HELP BUBBLE --- */
+        .help-bubble {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 30px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.3);
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            animation: bounce 2s infinite;
+            z-index: 1000;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .help-bubble:hover { transform: scale(1.05); animation: none; }
+
+        /* --- MOBILE RESPONSIVENESS --- */
+        @media (max-width: 768px) {
+            .help-bubble {
+                bottom: 80px;
+                right: 15px;
+                padding: 12px 18px;
+                font-size: 14px;
+            }
+            
+            .chat-window {
+                right: 10px;
+                left: 10px;
+                width: auto;
+                max-width: 100%;
+                bottom: 10px;
+                height: 80vh;
+            }
+            
+            .main-container {
+                margin: 10px;
+            }
+            
+            .content-body {
+                padding: 30px 20px;
+                padding-bottom: 120px;
+            }
+            
+            .nav-container {
+                flex-wrap: wrap;
+            }
+            
+            .nav-btn {
+                font-size: 0.9em;
+                padding: 8px 15px;
+            }
+        }
+
+        /* --- CHATBOT WINDOW --- */
+        .chat-window {
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            width: 380px;
+            height: 500px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            z-index: 1001;
+            animation: slideInRight 0.3s ease;
+        }
+        @keyframes slideInRight { 
+            from { opacity: 0; transform: translateX(50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        .chat-window.active { display: flex; }
+        
+        .chat-header { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            color: white; 
+            padding: 20px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+        }
+        
+        .chat-body { 
+            flex: 1; 
+            background: #f8f9fa; 
+            padding: 20px; 
+            overflow-y: auto; 
+        }
+        
+        .chat-footer { 
+            padding: 15px; 
+            background: white; 
+            border-top: 1px solid #eee; 
+            display: flex; 
+            gap: 10px; 
+        }
+        
+        .chat-input { 
+            flex: 1; 
+            padding: 12px 15px; 
+            border: 2px solid #eee; 
+            border-radius: 25px; 
+            outline: none; 
+            transition: all 0.3s; 
+        }
+        .chat-input:focus { border-color: #667eea; }
+        
+        .chat-send { 
+            width: 45px; 
+            height: 45px; 
+            border-radius: 50%; 
+            background: #667eea; 
+            color: white; 
+            border: none; 
+            cursor: pointer; 
+            flex-shrink: 0; 
+        }
+        .chat-send:hover { background: #5a6fd6; }
+
+        .message { 
+            margin-bottom: 15px; 
+            display: flex; 
+            align-items: flex-end; 
+            gap: 8px; 
+        }
+        .message.user { flex-direction: row-reverse; }
+        
+        .msg-bubble { 
+            max-width: 80%; 
+            padding: 12px 16px; 
+            border-radius: 18px; 
+            line-height: 1.4; 
+            font-size: 0.95em; 
+        }
+        .bot .msg-bubble { 
+            background: white; 
+            border: 1px solid #eee; 
+            border-bottom-left-radius: 4px; 
+            color: #333; 
+        }
+        .user .msg-bubble { 
+            background: #667eea; 
+            color: white; 
+            border-bottom-right-radius: 4px; 
+        }
+        
+        .bot-avatar { 
+            width: 30px; 
+            height: 30px; 
+            background: #764ba2; 
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 14px; 
+            color: white; 
+            flex-shrink: 0; 
+        }
+        
+        .quick-replies { 
+            display: flex; 
+            flex-wrap: wrap; 
+            gap: 8px; 
+            margin-top: 15px; 
+        }
+        .quick-reply-btn { 
+            background: #eef2ff; 
+            color: #667eea; 
+            border: 1px solid #667eea; 
+            padding: 6px 12px; 
+            border-radius: 15px; 
+            font-size: 0.85em; 
+            cursor: pointer; 
+            transition: all 0.2s; 
+        }
+        .quick-reply-btn:hover { 
+            background: #667eea; 
+            color: white; 
+        }
+
+        /* --- RESPONSIVE --- */
+        @media (max-width: 768px) {
+            .content-body, .header-section { padding: 30px 20px; }
+            h1 { font-size: 2em; }
+            .category-tabs { gap: 8px; }
+            .category-tab { padding: 8px 16px; font-size: 0.9em; }
+            .faq-question { padding: 15px 20px; }
+            
+            /* Mobile chat adjustments */
+            .chat-window { 
+                width: calc(100% - 40px); 
+                right: 20px; 
+                bottom: 80px; 
+                height: 60vh; 
+                max-height: 500px;
+            }
+            .help-bubble { 
+                bottom: 20px; 
+                right: 20px; 
+                padding: 12px 20px;
+                font-size: 0.9em;
+            }
+        }
+
+        /* --- COMPLETION CERTIFICATE --- */
+        .certificate {
+            background: linear-gradient(135deg, #f0f4ff 0%, #e5ecff 100%);
+            border: 3px solid #667eea;
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            margin: 40px 0;
+            display: none;
+        }
+        .certificate.show { display: block; animation: zoomIn 0.5s ease; }
+        @keyframes zoomIn { 
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .certificate h2 { color: #667eea; margin-bottom: 20px; }
+        .certificate .emoji { font-size: 4em; margin-bottom: 20px; }
+        .certificate .score { font-size: 2em; font-weight: bold; color: #764ba2; }
+
+        /* --- INFO BOXES --- */
+        .info-box { padding: 20px 25px; border-radius: 12px; margin-bottom: 25px; line-height: 1.6; }
+        .info-box h3 { margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
+        .warning-box { background: #f8d7da; border-left: 5px solid #dc3545; color: #721c24; }
+        .tip-box { background: #d1ecf1; border-left: 5px solid #17a2b8; color: #0c5460; }
+
+        /* --- DISCLAIMER BANNER --- */
+        .disclaimer-banner {
+            background: #fff3cd;
+            color: #856404;
+            padding: 15px 40px;
+            text-align: center;
+            border-bottom: 2px solid #ffc107;
+            font-size: 0.95em;
+            line-height: 1.4;
+        }
+
+        /* --- FLOATING HOME BUTTON --- */
+        .home-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: white;
+            color: #667eea;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            text-decoration: none;
+            transition: all 0.3s;
+            z-index: 100;
+        }
+        .home-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="home-button" title="Back to Home">🏠</a>
+    <div class="main-container">
+        <header class="header-section">
+            <h1>📚 Course Match Interactive Tutorial</h1>
+            <p class="subtitle">Unofficial guide to understanding the Course Match system</p>
+        </header>
+
+        <div class="disclaimer-banner">
+            <strong>⚠️ Unofficial Beta:</strong> This is a student-created resource. Information may not be 100% accurate. Always verify with official CBS sources before making registration decisions.
+        </div>
+
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+        <div class="progress-text" id="progressText">Progress: 0% - Explore all sections and complete quizzes</div>
+
+        <div class="content-body">
+            <div class="category-tabs">
+                <button class="category-tab active" onclick="showCategory('basics')">🎯 Basics</button>
+                <button class="category-tab" onclick="showCategory('strategy')">🧠 Strategy</button>
+                <button class="category-tab" onclick="showCategory('buckets')">📦 Bucket System</button>
+                <button class="category-tab" onclick="showCategory('system')">⚙️ System Mechanics</button>
+                <button class="category-tab" onclick="showCategory('mistakes')">⚠️ Common Mistakes</button>
+                <button class="category-tab" onclick="showCategory('advanced')">🚀 Advanced Tips</button>
+            </div>
+
+            <!-- BASICS SECTION -->
+            <div class="faq-section active" id="basics">
+                <div class="info-box tip-box" style="background: #e3f2fd; border-left-color: #2196f3;">
+                    <h3>📌 Official CBS Resources</h3>
+                    <p>This tutorial is based on "A Guide to Course Match at Columbia Business School" by the CBS Office of Records and Registration. Before using this unofficial guide, bookmark these official CBS pages:</p>
+                    <ul style="margin-top: 10px;">
+                        <li><a href="https://courses.business.columbia.edu/" target="_blank" style="color: #1976d2; font-weight: bold;">CBS Course Catalog</a> - Browse all available courses and descriptions</li>
+                        <li><a href="https://students.business.columbia.edu/records-registration/course-match-registration-calendar" target="_blank" style="color: #1976d2; font-weight: bold;">Course Match Registration Calendar</a> - Current deadlines (4:00 PM EST)</li>
+                        <li><a href="https://coursematch.gsb.columbia.edu" target="_blank" style="color: #1976d2; font-weight: bold;">Course Match System</a> - Where you'll actually rank courses</li>
+                        <li><a href="https://students.business.columbia.edu/records-registration/mba-scheduling-resources" target="_blank" style="color: #1976d2; font-weight: bold;">MBA Scheduling Resources</a> - Schedule planning tools and guides</li>
+                        <li><a href="https://students.business.columbia.edu/records-registration/course-match-registration/historical-course-match-results" target="_blank" style="color: #1976d2; font-weight: bold;">Historical Course Match Results</a> - Official heatmaps and data</li>
+                        <li><a href="https://academics.business.columbia.edu/mba/academics/curriculum-pathways" target="_blank" style="color: #1976d2; font-weight: bold;">Curriculum Pathways</a> - Course recommendations by career interest</li>
+                        <li><a href="https://vergil.columbia.edu/" target="_blank" style="color: #1976d2; font-weight: bold;">Vergil</a> - For add/drop AFTER Course Match (not for ranking)</li>
+                    </ul>
+                    
+                    <div class="warning-box" style="margin-top: 20px;">
+                        <h4>⚠️ Important: Course Match vs. Vergil</h4>
+                        <p><strong>Course Match ranking happens at:</strong> <a href="https://coursematch.gsb.columbia.edu" target="_blank" style="color: #dc3545; font-weight: bold;">coursematch.gsb.columbia.edu</a></p>
+                        <p style="margin-top: 10px;">NOT in Vergil! Vergil is only used for add/drop after Course Match results are released.</p>
+                    </div>
+                </div>
+
+                <div class="info-box warning-box" style="background: #f8f9fa; border-left-color: #764ba2; margin-top: 20px;">
+                    <h3>📊 Historical Data Insights</h3>
+                    <p>Want to see which courses were most highly ranked in past terms?</p>
+                    <p><a href="course-popularity-ticker.html" style="background: #764ba2; color: white; padding: 10px 20px; border-radius: 25px; text-decoration: none; display: inline-block; margin-top: 10px; font-weight: bold;">View Course Popularity Data →</a></p>
+                </div>
+
+                <div class="info-box tip-box" style="background: #e3f2fd; border-left-color: #2196f3; margin-top: 20px;">
+                    <h3>📋 Need a Step-by-Step Guide?</h3>
+                    <p>Use our comprehensive preparation checklist to ensure you don't miss anything!</p>
+                    <p><a href="checklist.html" style="background: #2196f3; color: white; padding: 10px 20px; border-radius: 25px; text-decoration: none; display: inline-block; margin-top: 10px; font-weight: bold;">View Preparation Checklist →</a></p>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFAQ(this)">
+                        What is Course Match?
+                        <span class="faq-icon">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Course Match is Columbia Business School's fair course allocation system based on Nobel Prize-winning economic theory. Unlike "first-come, first-served" registration:</p>
+                        <ul>
+                            <li>Everyone submits preferences during the same window</li>
+                            <li>An algorithm assigns courses to maximize overall student satisfaction</li>
+                            <li>Your chances depend on your preferences and course popularity, not registration speed</li>
+                            <li>The system is specifically designed to reward honest ranking</li>
+                        </ul>
+                        
+                        <div class="quiz-box">
+                            <h4>🤔 Quick Check: Why is Course Match fairer than first-come-first-served?</h4>
+                            <div class="quiz-options">
+                                <div class="quiz-option" onclick="checkAnswer(this, false, 'quiz1')">It's faster</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, true, 'quiz1')">Everyone has equal opportunity regardless of registration time</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false, 'quiz1')">It guarantees you get all your top choices</div>
+                            </div>
+                            <div class="quiz-feedback" id="quiz1-feedback"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFAQ(this)">
+                        When can I submit my rankings?
+                        <span class="faq-icon">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>The ranking window for Columbia Business School typically:</p>
+                        <ul>
+                            <li>Opens several days before the term begins</li>
+                            <li>Remains open for 5-7 days</li>
+                            <li><strong>Closes at 4:00 PM EST on the deadline</strong></li>
+                            <li>Allows unlimited changes until the deadline</li>
+                            <li>Only counts your final submission</li>
+                        </ul>
+                        
+                        <div class="warning-box" style="margin-top: 20px;">
+                            <h3>⚠️ Always Verify Current Dates</h3>
+                            <p>Deadlines and dates change each term. Always check the official CBS Course Match Registration Calendar for the most up-to-date information:</p>
+                            <p style="margin-top: 10px;">
+                                <a href="https://students.business.columbia.edu/records-registration/course-match-registration-calendar" 
+                                   target="_blank" 
+                                   style="background: #dc3545; color: white; padding: 10px 20px; border-radius: 25px; text-decoration: none; display: inline-block; font-weight: bold;">
+                                    📅 View Official CBS Calendar
+                                </a>
+                            </p>
+                        </div>
+
+                        <div class="warning-box" style="margin-top: 20px; background: #f8d7da; border-left: 5px solid #dc3545;">
+                            <h3>🚨 Critical: Submit 24 Hours Early!</h3>
+                            <p><strong>Do NOT wait until deadline day!</strong> Last-minute submissions risk:</p>
+                            <ul style="margin-top: 10px; margin-left: 20px;">
+                                <li>System overload or crashes</li>
+                                <li>No time to fix technical issues</li>
+                                <li>No support available if problems occur</li>
+                                <li>Missing the 4:00 PM deadline entirely</li>
+                            </ul>
+                            <p style="margin-top: 10px;"><strong>Best practice:</strong> Submit your final rankings at least 24 hours before the deadline!</p>
+                        </div>
+                        
+                        <div class="try-it-box">
+                            <h4>💡 Pro Tip: Set Three Reminders!</h4>
+                            <p>1. <strong>Opening day:</strong> Start exploring courses<br>
+                            2. <strong>Two days before deadline:</strong> Review and adjust rankings<br>
+                            3. <strong>24 hours before deadline:</strong> Final submission (avoid last-minute system issues!)</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFAQ(this)">
+                        How should I select my target credits?
+                        <span class="faq-icon">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p><strong>IMPORTANT: Select your target credits in 1.5 credit increments only!</strong></p>
+                        <p>Valid options: 1.5, 3.0, 4.5, 6.0, 7.5, 9.0, 10.5, 12.0, 13.5, 15.0, 16.5, 18.0</p>
+                        
+                        <div class="tip-box">
+                            <h4>📐 Why 1.5 increments?</h4>
+                            <p>Most CBS courses are either 1.5 or 3.0 credits. The system requires these increments to ensure valid schedule combinations.</p>
+                        </div>
+                        
+                        <ul style="margin-top: 15px;">
+                            <li><strong>Full-time students:</strong> Typically target 12-15 credits</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFAQ(this)">
+                        How many courses should I rank?
+                        <span class="faq-icon">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p><strong>This is the #1 most important rule:</strong> Rank 2x the number of credits you need!</p>
+                        <ul>
+                            <li>If you need 15 credits → Rank about 30 credits worth of courses</li>
+                            <li>If you need 12 credits → Rank about 24 credits worth</li>
+                            <li>If you need 6 credits → Rank about 12 credits worth</li>
+                        </ul>
+                        
+                        <div class="warning-box" style="margin-top: 20px;">
+                            <h3 style="margin-top: 0;">⚠️ Avoid Over-Ranking!</h3>
+                            <p style="margin-bottom: 10px;"><strong>Don't rank more than 25 courses.</strong> If you're taking 15 credits, ranking 30 credits worth makes sense. But ranking 97 choices (120+ credits) creates unnecessary overlap and confusion.</p>
+                            <p style="margin-bottom: 0;"><strong>Be strategic:</strong> Focus on courses you genuinely want to take. Quality over quantity!</p>
+                        </div>
+                        
+                        <div class="tip-box" style="margin-top: 20px;">
+                            <h4 style="margin-top: 0;">✅ Smart Approach</h4>
+                            <ul style="margin: 0; padding-left: 20px;">
+                                <li>Rank courses you're genuinely interested in</li>
+                                <li>Include some "safety" options you'd be happy with</li>
+                                <li>Don't just add courses to hit a number</li>
+                                <li>Remember: Ranking more courses does NOT hurt your chances for top picks</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="info-box" style="margin-top: 20px;">
+                            <h4 style="margin-top: 0;">📌 Important Note on Favorite Bucket</h4>
+                            <ul style="margin: 0; padding-left: 20px;">
+                                <li>If you use your Favorite bucket, make sure it's a course you REALLY want</li>
+                                <li>The system may use most of your utility budget to get you that one course</li>
+                                <li>This could mean not getting a full schedule if your Favorite is highly competitive</li>
+                                <li>Consider: Is this course worth potentially sacrificing other courses?</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="quiz-box">
+                            <h4>🤔 Practice: If you need 5 courses this term, how many should you rank?</h4>
+                            <div class="quiz-options">
+                                <div class="quiz-option" onclick="checkAnswer(this, false, 'quiz2')">Exactly 5 courses</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false, 'quiz2')">6-7 courses</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, true, 'quiz2')">10-20 courses</div>
+                            </div>
+                            <div class="quiz-feedback" id="quiz2-feedback"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFAQ(this)">
+                        What if I have registration holds?
+                        <span class="faq-icon">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Registration holds prevent you from accessing Course Match. Common holds include:</p>
+                        <ul>
+                            <li><strong>Immunization holds:</strong> Submit health forms to Student Health</li>
+                            <li><strong>Financial holds:</strong> Contact Student Financial Services</li>
+                            <li><strong>Academic holds:</strong> Meet with your academic advisor</li>
+                            <li><strong>International student holds:</strong> Check with ISSO for visa compliance</li>
+                        </ul>
+                        <p><strong>Important:</strong> Resolve holds BEFORE the ranking window opens, as they can take 24-48 hours to clear in the system.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFAQ(this)">
+                        Why can't I see a certain course in Course Match?
+                        <span class="faq-icon">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>There are several reasons why a course might not appear in your Course Match options:</p>
+                        <ul>
+                            <li><strong>Time conflict with core courses:</strong> Check the course pages for schedule details - courses that conflict with your pre-enrolled cores won't appear</li>
+                            <li><strong>Application-only course:</strong> Some courses require direct application to the Center/Program before Course Match</li>
+                            <li><strong>Not open to your program:</strong> The course may be restricted to specific programs (Full-time, EMBA, etc.)</li>
+                            <li><strong>Prerequisites not met:</strong> You may need to complete certain courses first</li>
+                        </ul>
+                        <p style="margin-top: 10px;"><strong>Good news:</strong> Even if not available in Course Match, the course might open during Add/Drop pending space availability!</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STRATEGY SECTION -->
+            <div class="faq-section" id="strategy">
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFAQ(this)">
+                        Should I try to "game" the system?
+                        <span class="faq-icon">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p><strong>No! The algorithm is strategy-proof.</strong> This means:</p>
+                        <ul>
+                            <li>Ranking honestly is mathematically proven to be your best strategy</li>
+                            <li>The algorithm was designed by Nobel laureate Alvin Roth specifically to prevent gaming</li>
+                            <li>Trying to manipulate rankings will only hurt your chances</li>
+                            <li>Students who rank strategically often end up in courses they don't want</li>
+                        </ul>
+                        
+                        <div class="try-it-box">
+                            <h4>⚠️ Common Gaming Mistakes to Avoid:</h4>
+                            <p>❌ Ranking an unpopular course as Favorite to "guarantee" a spot<br>
+                            ❌ Not ranking competitive courses because you think you won't get them<br>
+                            ❌ Ranking courses you don't want just because they're unpopular<br>
+                            ❌ Trying to guess what others will rank</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFAQ(this)">
+                        How do I diversify my course selection?
+                        <span class="faq-icon">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Create a balanced schedule by mixing different types of courses:</p>
+                        <ul>
+                            <li><strong>Favorite bucket:</strong> Your absolute must-have course</li>
+                            <li><strong>Great bucket:</strong> Courses you're genuinely excited about</li>
+                            <li><strong>Good bucket:</strong> Solid courses that fit your interests</li>
+                            <li><strong>Acceptable bucket:</strong> "Safety" options you'd be satisfied with</li>
+                        </ul>
+                        
+                        <div class="try-it-box">
+                            <h4>📊 Diversification Ideas:</h4>
+                            <p>Consider mixing:<br>
+                            • Different subjects (Finance, Marketing, Strategy, Operations)<br>
+                            • Different formats (Case-based, lectures, workshops)<br>
+                            • Different workloads (Intensive vs. moderate)<br>
+                            • Different meeting times (Spread throughout the week)</p>
+                        </div>
+                    </div>
+                </div>
+
+                </div>
+
+            </div>
+
+            <!-- BUCKET SYSTEM SECTION -->
+            <div class="faq-section" id="buckets">
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFAQ(this)">
+                        How do the ranking buckets work?
+                        <span class="faq-icon">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Course Match uses a bucket system with different priority weights. The official guide explains it like "floors of a building" for buckets and "steps on a staircase" for order within buckets:</p>
+                        <ul>
+                            <li><strong>⭐ Favorite:</strong> Your #1 must-have course - only ONE allowed (highest utility)</li>
+                            <li><strong>✨ Great:</strong> Courses you really want (significantly lower than Favorite)</li>
+                            <li><strong>👍 Good:</strong> Courses you'd be happy with (much lower than Great)</li>
+                            <li><strong>✔️ Acceptable:</strong> Backup options you'd take if needed (lowest utility)</li>
+                        </ul>
+                        <p style="margin-top: 15px;"><strong>Example utility values:</strong> If courses are ranked one per bucket: 10,000 (Favorite) → 1,000 (Great) → 100 (Good) → 10 (Acceptable). But if all in same bucket: 10,000 → 9,500 → 9,000 → 8,500.</p>
+                        
+                        <div class="quiz-box">
+                            <h4>🤔 Understanding the System: Placing a course in "Great" means you'd prefer it over:</h4>
+                            <div class="quiz-options">
+                                <div class="quiz-option" onclick="checkAnswer(this, false, 'quiz3')">Just one course from "Good"</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, true, 'quiz3')">Several courses from "Good" combined</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false, 'quiz3')">All courses in "Good"</div>
+                            </div>
+                            <div class="quiz-feedback" id="quiz3-feedback"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFAQ(this)">
+                        What should go in my Favorite bucket?
+                        <span class="faq-icon">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Choose your Favorite carefully - you only get ONE:</p>
+                        <ul>
+                            <li>Must be a course you absolutely need/want above all others</li>
+                            <li>Could be a course that rarely appears or has limited seats</li>
+                            <li>Could be a unique elective with a star professor</li>
+                            <li>Should NOT be an "easy to get" course (waste of Favorite status)</li>
+                        </ul>
+                        
+                        <div class="try-it-box">
+                            <h4>🎯 Favorite Selection Checklist:</h4>
+                            <p>✓ Is this course critical to your academic plan?<br>
+                            ✓ Would you be very disappointed without it?<br>
+                            ✓ Is it likely to be competitive?<br>
+                            If you answered "yes" to all three, it's a good Favorite choice!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFAQ(this)">
+                        How should I use the other buckets?
+                        <span class="faq-icon">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Strategic use of each bucket:</p>
+                        <ul>
+                            <li><strong>Great (3-6 courses):</strong> Courses you'd be genuinely excited about. Include both reaches and realistic options.</li>
+                            <li><strong>Good (4-8 courses):</strong> Solid courses that fit your schedule. Mix of different subjects/times.</li>
+                            <li><strong>Acceptable (3-6 courses):</strong> Safety net courses. Must be courses you'd actually attend!</li>
+                        </ul>
+                        
+                        <div class="warning-box">
+                            <h3>⚠️ Critical Warning</h3>
+                            <p>Never rank courses you wouldn't actually take! The algorithm might assign them to you.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SYSTEM MECHANICS SECTION -->
+            <div class="faq-section" id="system">
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFAQ(this)">
+                        How does the budget system work?
+                        <span class="faq-icon">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p><strong>Each student has a budget to "purchase" courses based on clearing prices:</strong></p>
+                        <ul>
+                            <li><strong>1st year students:</strong> Have lower budgets</li>
+                            <li><strong>2nd year students:</strong> Have higher budgets (includes leftover bid points from previous terms)</li>
+                            <li><strong>Tie-breakers:</strong> Small random variations added to break ties when students have identical preferences</li>
+                        </ul>
+                        
+                        <div class="warning-box">
+                            <h3>⚠️ Key Point</h3>
+                            <p>You can't see your budget or clearing prices in advance. Just rank honestly - the algorithm handles the rest!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFAQ(this)">
+                        What are clearing prices?
+                        <span class="faq-icon">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p><strong>Clearing prices are determined AFTER everyone submits rankings:</strong></p>
+                        <ul>
+                            <li>Based on supply (available seats) and demand (student preferences)</li>
+                            <li>Popular courses have higher clearing prices</li>
+                            <li>Less popular courses have lower clearing prices</li>
+                            <li>The algorithm uses these prices to allocate courses fairly</li>
+                        </ul>
+                        
+                        <div class="tip-box">
+                            <h3>💡 Strategy Tip</h3>
+                            <p>Ranking more courses gives you access to lower-priced options, helping you afford your top choices while filling your schedule.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFAQ(this)">
+                        What is "utility" in Course Match?
+                        <span class="faq-icon">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p><strong>Utility represents your happiness or value from a schedule:</strong></p>
+                        <ul>
+                            <li>Course Match estimates utility from your rankings</li>
+                            <li>Big utility jumps between buckets (Favorite → Great → Good)</li>
+                            <li>Small utility changes within the same bucket</li>
+                            <li>The algorithm tries to maximize your total utility within budget constraints</li>
+                        </ul>
+                        
+                        <div class="try-it-box">
+                            <h4>📊 Remember the Building Analogy:</h4>
+                            <p>• Buckets = Different floors (big jumps)<br>
+                            • Order within buckets = Steps on stairs (small changes)</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFAQ(this)">
+                        How does the algorithm assign schedules?
+                        <span class="faq-icon">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p><strong>The Course Match algorithm follows these steps:</strong></p>
+                        <ol>
+                            <li>Creates all possible valid schedules for each student</li>
+                            <li>Orders them by utility (based on your rankings)</li>
+                            <li>Determines clearing prices based on overall demand</li>
+                            <li>Gives you the highest utility schedule you can afford</li>
+                            <li>Always tries to meet minimum credit requirements</li>
+                        </ol>
+                        
+                        <div class="warning-box">
+                            <h3>⚠️ Important</h3>
+                            <p>If you use your Favorite bucket for a highly competitive course, the algorithm might spend most of your utility budget to get you that one course. This could mean you don't get a full schedule and will need to add courses during the add/drop period!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- COMMON MISTAKES SECTION -->
+            <div class="faq-section" id="mistakes">
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFAQ(this)">
+                        What are the biggest mistakes students make?
+                        <span class="faq-icon">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Avoid these common pitfalls:</p>
+                        <ol>
+                            <li><strong>Not ranking enough courses</strong> - The #1 mistake!</li>
+                            <li><strong>Waiting until the last minute</strong> - Submit 24 hours early to avoid system issues</li>
+                            <li><strong>Wrong credit increments</strong> - Must use 1.5 credit increments (e.g., 12.0, 13.5, 15.0)</li>
+                            <li><strong>Over-ranking courses</strong> - Don't rank 25+ courses if you only need 15 credits</li>
+                            <li><strong>Leaving buckets empty</strong> - Use all buckets for flexibility</li>
+                            <li><strong>Ranking courses you won't actually take</strong> - You might get stuck with them</li>
+                            <li><strong>Ignoring time conflicts</strong> - The system doesn't check your calendar</li>
+                            <li><strong>Forgetting to submit</strong> - Changes save, but you must click submit!</li>
+                            <li><strong>Not checking prerequisites</strong> - Make sure you're eligible</li>
+                        </ol>
+                        
+                        <div class="quiz-box">
+                            <h4>🤔 Scenario: You see a preview schedule with a course you hate. What should you do?</h4>
+                            <div class="quiz-options">
+                                <div class="quiz-option" onclick="checkAnswer(this, false, 'quiz4')">Hope for the best</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false, 'quiz4')">Remove some highly-ranked courses</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, true, 'quiz4')">Add more courses to Good/Acceptable buckets</div>
+                            </div>
+                            <div class="quiz-feedback" id="quiz4-feedback"></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ADVANCED TIPS SECTION -->
+            <div class="faq-section" id="advanced">
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFAQ(this)">
+                        How can I estimate course popularity?
+                        <span class="faq-icon">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>While exact demand is hidden, you can make educated guesses:</p>
+                        <ul>
+                            <li><strong>High demand indicators:</strong> 
+                                <ul>
+                                    <li>Star professors (check evaluations in course pages)</li>
+                                    <li>Prime time slots (Tuesday/Thursday afternoons)</li>
+                                    <li>New or trending topics</li>
+                                    <li>Small class size limits</li>
+                                </ul>
+                            </li>
+                            <li><strong>Lower demand indicators:</strong> 
+                                <ul>
+                                    <li>9:00 AM or 6:00 PM course times</li>
+                                    <li>Highly specialized topics</li>
+                                    <li>Many prerequisites</li>
+                                    <li>Large lecture halls</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFAQ(this)">
+                        Can I coordinate with friends?
+                        <span class="faq-icon">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Course Match doesn't have a way to directly link registrations with friends:</p>
+                        <ul>
+                            <li>You can't "link" registrations or guarantee being together</li>
+                            <li>Each student's preferences and utility budget are different</li>
+                            <li>Course allocation depends on demand, capacity, and individual budgets</li>
+                            <li>Even if you rank the same courses, outcomes may differ</li>
+                            <li>Popular courses may only have room for some of your group</li>
+                        </ul>
+                        
+                        <div class="try-it-box">
+                            <h4>👥 Reality Check:</h4>
+                            <p>• Focus on courses YOU want to take<br>
+                            • Each person should rank based on their own preferences<br>
+                            • Compare schedules after results are released<br>
+                            • Consider coordinating during add/drop period<br>
+                            • Remember: Different preferences = different results</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFAQ(this)">
+                        What happens after ranking closes?
+                        <span class="faq-icon">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>The post-ranking timeline at Columbia Business School:</p>
+                        <ul>
+                            <li><strong>Processing:</strong> Takes 1-3 weeks (varies by term)</li>
+                            <li><strong>Results released:</strong> Check your assigned schedule via email notification</li>
+                            <li><strong>Add/Drop period:</strong> Check the official calendar for dates</li>
+                            <li><strong>Waitlists:</strong> Join strategically (up to 27 credits enrolled + waitlisted combined)</li>
+                            <li><strong>Shopping period:</strong> Attend first classes even if waitlisted</li>
+                        </ul>
+                        
+                        <div class="try-it-box">
+                            <h4>📅 Post-Results Action Plan:</h4>
+                            <p>✓ Screenshot your assigned schedule immediately<br>
+                            ✓ Check for any time conflicts or issues<br>
+                            ✓ Join waitlists for desired courses<br>
+                            ✓ Remember: 27 credit limit for enrolled + waitlisted<br>
+                            ✓ Attend ALL first classes (assigned + waitlisted)<br>
+                            ✓ Have Add/Drop backup plans ready</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFAQ(this)">
+                        What are "Rules" and how do I use them?
+                        <span class="faq-icon">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p><strong>Rules tell Course Match which courses you consider substitutes.</strong> Use them when you only want one course from a group, even if ranked highly.</p>
+                        <ul>
+                            <li>Example: Multiple sections of the same course</li>
+                            <li>Example: Similar electives where you only need one</li>
+                            <li>You can set to take as few as 1 or as many as 3 from a group</li>
+                        </ul>
+                        
+                        <div class="try-it-box">
+                            <h4>📝 How to Create Rules:</h4>
+                            <p>1. Rank your courses normally first<br>
+                            2. Click "Add Rule" button at bottom of ranking page<br>
+                            3. Select which courses are substitutes<br>
+                            4. Choose how many you want (1-3)</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFAQ(this)">
+                        Why didn't I get my Favorite but my friend who ranked it lower did?
+                        <span class="faq-icon">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p><strong>Most likely your friend could afford it but you couldn't:</strong></p>
+                        <ul>
+                            <li>Your friend may have had a larger budget or tie-breaker</li>
+                            <li>Their Favorite course may have had lower demand (cheaper)</li>
+                            <li>They may have ranked more courses, giving more flexibility</li>
+                        </ul>
+                        
+                        <div class="try-it-box">
+                            <h4>🔍 Another Possibility:</h4>
+                            <p>If you didn't rank enough courses, Course Match couldn't create a complete schedule with that course within your budget. Always rank 2-4x what you need!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFAQ(this)">
+                        Any final pro tips?
+                        <span class="faq-icon">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Advanced strategies from successful students:</p>
+                        <ul>
+                            <li><strong>Time diversity:</strong> Rank courses at different times to avoid conflicts</li>
+                            <li><strong>Subject diversity:</strong> Mix quantitative and qualitative courses</li>
+                            <li><strong>Professor research:</strong> Check teaching ratings and styles</li>
+                            <li><strong>Workload balance:</strong> Mix intensive and lighter courses</li>
+                            <li><strong>Network effect:</strong> Consider which courses alumni recommend</li>
+                        </ul>
+                        
+                        <div class="try-it-box">
+                            <h4>💫 Remember: Be Fair to Yourself</h4>
+                            <p>Course Match creates fair schedules, but you need to be realistic too. You won't get all the popular courses - everyone wants them! Create a balanced mix of highly competitive courses and solid alternatives. The algorithm works best when you give it good options to work with.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- COMPLETION CERTIFICATE -->
+            <div class="certificate" id="certificate">
+                <div class="emoji">🎓</div>
+                <h2>Tutorial Completed!</h2>
+                <p>You've completed the unofficial Course Match Information tutorial.</p>
+                <div class="score" id="finalScore">Score: 0/4 Quizzes Correct</div>
+                <p style="margin-top: 20px;">You're now better prepared for Course Match!</p>
+                <p style="margin-top: 10px; font-size: 0.9em; color: #666;">Remember: Submit 24 hours early and always refer to official CBS Office of Records and Registration resources.</p>
+            </div>
+
+            <div class="nav-container">
+                <div style="text-align: center; margin-bottom: 30px; padding: 20px; background: #f5f5f5; border-radius: 10px;">
+                    <p style="font-size: 0.9em; color: #666; line-height: 1.6;">
+                        <strong>Attribution:</strong> This tutorial is based on "A Guide to Course Match at Columbia Business School"<br>
+                        created by the Columbia Business School Office of Records and Registration.<br>
+                        All Course Match policies and procedures are property of Columbia Business School.<br>
+                        This is an unofficial adaptation for educational purposes only.
+                    </p>
+                </div>
+                <a href="index.html" class="nav-btn secondary">🏠 Home</a>
+                <a href="readiness-check.html" class="nav-btn secondary">← Back to Readiness Check</a>
+                <button class="nav-btn" id="completeBtn" onclick="completeTutorial()" style="display: none;">Complete Tutorial 🎉</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FEEDBACK SECTION -->
+    <div class="container" style="margin-top: 20px; margin-bottom: 40px;">
+        <div class="info-box" style="background: #e3f2fd; border-left-color: #2196f3; text-align: center;">
+            <h3>💭 Help Improve Course Match!</h3>
+            <p>Your feedback helps CBS improve the Course Match experience for all students.</p>
+            <p style="margin-top: 15px;">
+                <a href="https://columbia.qualtrics.com/jfe/form/SV_0O58bmRFTw2GT2K" 
+                   target="_blank" 
+                   style="background: #2196f3; color: white; padding: 12px 30px; border-radius: 25px; text-decoration: none; display: inline-block; font-weight: bold; font-size: 16px;">
+                    Share Your Course Match Feedback with CBS →
+                </a>
+            </p>
+            <p style="margin-top: 15px; font-size: 0.9em; color: #666;">
+                Takes only 2-3 minutes • Your input matters • Help future students
+            </p>
+        </div>
+    </div>
+
+    <!-- Feedback Popup (appears after 3 minutes) -->
+    <div id="feedbackPopup" style="display: none; position: fixed; bottom: 20px; left: 20px; background: white; border-radius: 12px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); max-width: 350px; z-index: 9998;">
+        <button onclick="closeFeedbackPopup()" style="position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 20px; cursor: pointer;">×</button>
+        <h4 style="margin-bottom: 10px; color: #2c3e50;">Found this tutorial helpful? 💡</h4>
+        <p style="margin-bottom: 15px; color: #666;">Share your Course Match experience with CBS to help improve the system!</p>
+        <a href="https://columbia.qualtrics.com/jfe/form/SV_0O58bmRFTw2GT2K" 
+           target="_blank" 
+           onclick="closeFeedbackPopup()"
+           style="background: #2196f3; color: white; padding: 10px 20px; border-radius: 20px; text-decoration: none; display: inline-block; font-weight: bold; font-size: 14px; width: 100%; text-align: center;">
+            Take the CBS Survey (2-3 min) →
+        </a>
+        <button onclick="closeFeedbackPopup()" style="background: none; border: none; color: #999; font-size: 12px; cursor: pointer; margin-top: 10px; width: 100%;">Maybe later</button>
+    </div>
+
+    <div class="help-bubble" onclick="toggleChat()">
+        Need help? Click me! 💬
+    </div>
+
+    <!-- CHATBOT WINDOW -->
+    <div id="chatWindow" class="chat-window">
+        <div class="chat-header">
+            <h3>Course Match Assistant</h3>
+            <button onclick="toggleChat()" style="background:none;border:none;color:white;font-size:24px;cursor:pointer;">×</button>
+        </div>
+        <div class="chat-body" id="chatBody">
+            <div class="message bot">
+                <div class="bot-avatar">🤖</div>
+                <div class="msg-bubble">
+                    Hi! I'm your Course Match Assistant. I can help answer common questions, but for official clarification on important matters, please email coursematch@gsb.columbia.edu.
+                    <div class="quick-replies">
+                        <button class="quick-reply-btn" onclick="sendQuickReply('How many courses should I rank?')">How many to rank?</button>
+                        <button class="quick-reply-btn" onclick="sendQuickReply('I only got assigned 3 credits')">Got partial schedule?</button>
+                        <button class="quick-reply-btn" onclick="sendQuickReply('What is the Favorite bucket?')">Favorite bucket?</button>
+                        <button class="quick-reply-btn" onclick="sendQuickReply('I\'m getting an error')">Technical issues?</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="chat-footer">
+            <input type="text" id="chatInput" class="chat-input" placeholder="Type your question..." onkeypress="handleKeyPress(event)">
+            <button class="chat-send" onclick="sendMessage()">➤</button>
+        </div>
+    </div>
+
+    <script>
+        // Track progress
+        let answeredQuizzes = new Set();
+        let correctAnswers = 0;
+        let expandedFAQs = new Set();
+        let viewedCategories = new Set(['basics']); // Start with basics viewed
+        
+        // Toggle FAQ items
+        function toggleFAQ(element) {
+            const faqItem = element.parentElement;
+            const wasExpanded = faqItem.classList.contains('expanded');
+            
+            // Toggle current item
+            if (!wasExpanded) {
+                faqItem.classList.add('expanded');
+                // Track unique FAQs opened
+                const faqId = faqItem.querySelector('.faq-question').textContent.trim();
+                expandedFAQs.add(faqId);
+            } else {
+                faqItem.classList.remove('expanded');
+            }
+            
+            updateProgress();
+        }
+
+        // Show category
+        function showCategory(category) {
+            // Update tabs
+            document.querySelectorAll('.category-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Update sections
+            document.querySelectorAll('.faq-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(category).classList.add('active');
+            
+            // Track viewed categories
+            viewedCategories.add(category);
+            updateProgress();
+        }
+
+        // Check quiz answer
+        function checkAnswer(element, isCorrect, quizId = 'quiz1') {
+            // Prevent re-answering
+            if (answeredQuizzes.has(quizId)) return;
+            
+            // Disable all options
+            const options = element.parentElement.querySelectorAll('.quiz-option');
+            options.forEach(opt => {
+                opt.style.pointerEvents = 'none';
+                opt.style.cursor = 'default';
+            });
+            
+            // Mark the selected answer
+            if (isCorrect) {
+                element.classList.add('correct');
+                correctAnswers++;
+                answeredQuizzes.add(quizId);
+            } else {
+                element.classList.add('incorrect');
+                answeredQuizzes.add(quizId);
+            }
+            
+            // Show feedback
+            const feedback = document.getElementById(quizId + '-feedback');
+            feedback.className = 'quiz-feedback show';
+            if (isCorrect) {
+                feedback.style.background = '#d4edda';
+                feedback.style.color = '#155724';
+                feedback.innerHTML = '✅ Correct! ' + getCorrectFeedback(quizId);
+            } else {
+                feedback.style.background = '#f8d7da';
+                feedback.style.color = '#721c24';
+                feedback.innerHTML = '❌ Not quite. ' + getIncorrectFeedback(quizId);
+            }
+            
+            updateProgress();
+        }
+
+        function getCorrectFeedback(quizId) {
+            const feedbacks = {
+                'quiz1': 'Course Match gives everyone equal opportunity regardless of when they submit.',
+                'quiz2': 'Ranking 2-4x more courses gives the algorithm flexibility to find you a good schedule.',
+                'quiz3': 'Favorite (10,000) ÷ Great (100) = 100x preference difference!',
+                'quiz4': 'Adding more backup options improves your preview schedules without affecting top choices.'
+            };
+            return feedbacks[quizId] || 'Great job!';
+        }
+
+        function getIncorrectFeedback(quizId) {
+            const feedbacks = {
+                'quiz1': 'Course Match is fairer because timing doesn\'t matter - everyone has equal opportunity.',
+                'quiz2': 'You should rank 2-4x the courses you need. For 5 courses, rank 10-20!',
+                'quiz3': 'Favorite is worth 10,000 points and Great is worth 100, so that\'s 100x more!',
+                'quiz4': 'Never remove good courses! Add more backups to improve preview schedules.'
+            };
+            return feedbacks[quizId] || 'Try again!';
+        }
+
+        // Update progress
+        function updateProgress() {
+            const totalQuizzes = 4;
+            const totalFAQs = document.querySelectorAll('.faq-item').length;
+            const totalCategories = 6;
+            
+            // Calculate progress components
+            const quizProgress = (answeredQuizzes.size / totalQuizzes) * 40;
+            const faqProgress = (expandedFAQs.size / totalFAQs) * 40;
+            const categoryProgress = (viewedCategories.size / totalCategories) * 20;
+            
+            const totalProgress = Math.round(quizProgress + faqProgress + categoryProgress);
+            
+            // Update UI
+            document.getElementById('progressBar').style.width = totalProgress + '%';
+            document.getElementById('progressText').textContent = `Progress: ${totalProgress}% - Explore all sections and complete quizzes`;
+            
+            // Show complete button when progress is high enough
+            if (totalProgress >= 80) {
+                document.getElementById('completeBtn').style.display = 'inline-block';
+            }
+        }
+
+        // Complete tutorial
+        function completeTutorial() {
+            document.getElementById('certificate').classList.add('show');
+            document.getElementById('finalScore').textContent = `Score: ${correctAnswers}/4 Quizzes Correct`;
+            
+            // Smooth scroll to certificate
+            document.getElementById('certificate').scrollIntoView({ 
+                behavior: 'smooth',
+                block: 'center'
+            });
+        }
+
+        // Scroll to top
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateProgress();
+        });
+
+        /* --- CHATBOT FUNCTIONALITY --- */
+        const chatResponses = {
+            // Basic questions
+            'how many': 'Rank about 2x the credits you need! If you need 15 credits, rank ~30 credits worth. But DON\'T over-rank - avoid going over 25 courses. Remember: Using Favorite means the system may spend most of your utility budget on that one course!',
+            'credits': 'IMPORTANT: Select target credits in 1.5 increments only! Valid: 1.5, 3.0, 4.5, 6.0, 7.5, 9.0, 10.5, 12.0, 13.5, 15.0, 16.5, 18.0. Full-time is usually 12-15 credits.',
+            'increment': 'You must use 1.5 credit increments! CBS courses are typically 1.5 or 3.0 credits, so the system requires these increments for valid schedules.',
+            
+            // Post-results issues
+            'assigned 3': 'If you were only assigned 3 credits, you need to act quickly during add/drop! Join waitlists immediately (up to 27 credits total enrolled+waitlisted). Attend ALL first classes - professors often add students. Check for open seats daily.',
+            'only got': 'Didn\'t get enough courses? Join waitlists NOW (up to 27 credits total). Attend first classes even if waitlisted. Check for drops daily during add/drop. Consider less popular sections or alternative courses.',
+            'no courses': 'Got no courses? This is rare but can happen with highly competitive selections. Immediately contact your advisor! Join waitlists, attend first classes, and be ready during add/drop. Some seats always open up.',
+            'partial schedule': 'For partial schedules: 1) Join waitlists immediately, 2) Attend ALL first classes, 3) Check daily for drops, 4) Have backup courses ready, 5) Talk to professors - they often add engaged students.',
+            'minimum': 'Course Match can assign fewer credits than your minimum when demand exceeds capacity. Your outcome is based on course demand and available seats across all sections. You\'ll be able to add courses during Add/Drop when seats open up.',
+            'fewer credits': 'Getting fewer credits than expected happens when the courses you ranked have higher demand than seats available. Even with a minimum set, Course Match may assign fewer credits. Use Add/Drop period to adjust your schedule as more options become available.',
+            'less than': 'If you received less than your target credits, it\'s because of high demand for your ranked courses. The system assigns based on demand vs. capacity. Don\'t worry - you can add courses during Add/Drop when seats open up!',
+            
+            // Bucket questions
+            'favorite': 'The Favorite bucket is for your #1 must-have course (only ONE allowed). BE CAREFUL: The system may use most of your utility budget to get you this course, potentially leaving less for a full schedule. Only use it if the course is truly worth that trade-off!',
+            'bucket': 'The buckets are: Favorite (10,000 pts), Great (100 pts), Good (20 pts), Acceptable (5 pts). Use all buckets for flexibility!',
+            'great': 'Put 3-6 courses you\'d be genuinely excited about in Great. Mix reaches and realistic options.',
+            'good': 'Put 4-8 solid courses that fit your schedule in Good. These are your reliable backups.',
+            'acceptable': 'Put 3-6 safety courses in Acceptable. They must be courses you\'d actually attend if assigned!',
+            
+            // Common concerns
+            'change': 'Yes! You can change your rankings as many times as you want until the deadline. Only your final submission counts. There\'s no advantage to submitting early.',
+            'deadline': 'The ranking window typically closes at 4:00 PM EST. ALWAYS check the official CBS calendar for exact dates. Submit 24 hours early to avoid system issues!',
+            'mistakes': 'Top mistakes: #1 Not ranking enough courses, #2 Wrong credit increments, #3 Over-ranking (25+ courses), #4 Using Favorite on highly competitive course without understanding the trade-off.',
+            
+            // Strategy questions
+            'strategy': 'The best strategy is to rank honestly! The algorithm is designed to reward truthful preferences. Don\'t try to game it by ranking unpopular courses higher - this will backfire.',
+            'game': 'Don\'t try to game the system! It\'s strategy-proof, designed by a Nobel laureate. Ranking honestly is mathematically proven to be your best strategy.',
+            'popular': 'Popular courses have star professors (check evaluations in course pages), convenient times (Tue/Thu afternoons), are new/trending, or have small class sizes. Check the historical data for demand ratios!',
+            
+            // Process questions
+            'waitlist': 'You can be on waitlists up to 27 total credits (enrolled + waitlisted). Attend first classes even if waitlisted. Professors often add engaged students. Check daily for openings!',
+            'add drop': 'Add/Drop period dates vary - check the calendar! Have backup plans ready. Dropping is easy but adding is hard if classes are full. Act fast in the first few days.',
+            'vergil': 'Course Match ranking happens at coursematch.gsb.columbia.edu, NOT Vergil! Vergil is only for add/drop after results are released.',
+            'clearing': 'Clearing prices are set AFTER everyone ranks, based on supply and demand. Popular courses cost more. You can\'t see prices in advance.',
+            'friend': 'Course Match doesn\'t link registrations. Each person\'s results depend on their own rankings, utility budget, and tie-breakers. Focus on YOUR preferences!',
+            
+            // Technical issues
+            'firefox': 'Use Chrome or Firefox for Course Match. Both browsers work well. Avoid Safari which has compatibility issues.',
+            'browser': 'Use Chrome or Firefox for Course Match. Safari has compatibility issues. Clear cache if having problems.',
+            'error': 'Getting errors? 1) Use Chrome or Firefox, 2) Clear browser cache, 3) Check for registration holds, 4) Try incognito mode, 5) Contact coursematch@gsb.columbia.edu',
+            'cant access': 'Can\'t access Course Match? Try: 1) Chrome or Firefox in incognito mode, 2) Close all browsers and restart, 3) Use coursematch.gsb.columbia.edu (no www), 4) Disable VPN/firewall, 5) Try different network/wifi.',
+            'no courses': 'Seeing no courses? This is usually a browser/network issue. Try: Chrome or Firefox incognito mode, clear cache, check you\'re at coursematch.gsb.columbia.edu, disable VPN, or try different internet connection.',
+            'blank': 'Blank screen? Browser issue! 1) Use Chrome or Firefox (not Safari), 2) Try incognito/private mode, 3) Clear all browser data, 4) Disable VPN, 5) Try different wifi network. The courses are there!',
+            'not loading': 'Page not loading? 1) Must use Chrome or Firefox, 2) Go to coursematch.gsb.columbia.edu exactly, 3) Try incognito mode, 4) Turn off VPN/firewall, 5) Switch to different internet connection.',
+            'vpn': 'VPNs and firewalls can block Course Match! Disable VPN, try different network, or use your phone\'s hotspot. Also ensure you\'re using Chrome or Firefox in incognito mode.',
+            'financial agreement': 'After signing financial agreements, if you still can\'t see courses: 1) New Chrome/Firefox incognito session, 2) Clear ALL browser data, 3) No VPN/firewall, 4) Try different network. It\'s a browser issue - courses are there!',
+            
+            // CBS specific
+            'hold': 'Registration holds prevent Course Match access. Common ones: immunization (health forms), financial (student services), academic (see advisor). Resolve BEFORE ranking opens!',
+            'full time': 'Full-time MBA students typically take 12-15 credits per term. Remember to use 1.5 credit increments when selecting your target!',
+            'part time': 'Part-time students should check with their advisor for credit requirements. The system works the same way - rank 2x what you need!',
+            
+            // Pre-enrollment and budget issues
+            'pre-enrolled': 'If you were pre-enrolled in a course, Course Match automatically applies a 20% reduction to your utility budget. This ensures fairness for students without pre-enrolled courses. For questions about your specific situation, email coursematch@gsb.columbia.edu.',
+            'reduction': 'The 20% budget reduction for pre-enrolled students is automatic and ensures fairness. It gives students without pre-enrolled courses a better chance at electives. This can affect your ability to get top choices.',
+            'acceptable': 'Getting only Acceptable courses is frustrating but can happen with high competition. Course Match results are final and cannot be manually adjusted. Focus on Add/Drop - meet with your advisor to explore alternatives.',
+            'only acceptable': 'Receiving only Acceptable-ranked courses happens when: 1) Your top choices were highly competitive, 2) Budget reductions applied, 3) Many students ranked the same courses. Use Add/Drop strategically.',
+            
+            // Fairness and system concerns
+            'unfair': 'We understand this feels unfair. Course Match outcomes are based on demand vs. available seats. When demand consistently exceeds capacity, not everyone gets top choices. For specific concerns, email coursematch@gsb.columbia.edu.',
+            'review': 'Unfortunately, Course Match results are final and cannot be manually adjusted or reviewed. The system runs once and allocations are set. Your best option is working with your advisor during Add/Drop.',
+            'manual adjustment': 'Course Match results cannot be manually adjusted. The system is designed to be fair and consistent for all students. Work with your academic advisor during Add/Drop to find alternative courses.',
+            'final': 'Course Match results are final once released. No manual adjustments or re-runs are possible. This ensures fairness for all students. For unique circumstances, contact coursematch@gsb.columbia.edu.',
+            // Emotional responses
+            'disappointed': 'We understand how disappointing this is, especially for your final semester. While results can\'t be changed, your advisor can help explore alternatives during Add/Drop that align with your academic goals.',
+            'frustrated': 'Your frustration is completely valid. Not getting top choices despite careful planning is difficult. Channel this energy into Add/Drop preparation - have backup options ready and check frequently.',
+            'last semester': 'Final semester pressure makes this extra stressful. While Course Match results are final, many students successfully adjust schedules during Add/Drop. Work closely with your advisor for the best alternatives.',
+            'tuition': 'We understand the financial investment makes this particularly frustrating. While Course Match can\'t guarantee top choices due to demand, your advisor can help maximize your remaining semester.',
+            
+            // Technical and process issues
+            'add drop not working': 'If Add/Drop has technical issues: 1) Try different browsers, 2) Clear cache, 3) Use different device, 4) Try at different times, 5) Document issues with screenshots for support.',
+            'more sections': 'Section availability is determined by faculty availability and resources. While we understand the frustration when demand exceeds supply, Course Match allocates existing seats as fairly as possible.',
+            
+            // Emergency responses
+            'help': 'What\'s your specific issue? Can\'t access courses? → Try Chrome incognito, disable VPN. Not enough credits? → Join waitlists up to 27 total. Only Acceptable courses? → Meet with advisor during Add/Drop.',
+            'panic': 'Take a deep breath! Course Match can be stressful but there are always options. What specific issue are you facing? I can help with access problems, rankings, results, waitlists, or technical issues.',
+            'access': 'Course Match access issues: 1) MUST use Chrome or Firefox (not Safari!), 2) Go to coursematch.gsb.columbia.edu, 3) Try incognito mode, 4) Disable all VPNs/firewalls, 5) Try phone hotspot instead of wifi.',
+            'network': 'Network blocking Course Match? Common fixes: 1) Turn off VPN completely, 2) Try your phone\'s hotspot, 3) Use different wifi (home vs campus), 4) Disable firewalls temporarily, 5) Clear ALL browser data.',
+            'logged in': 'Logged in but can\'t see courses? It\'s a browser/network issue! The courses ARE there. Try: 1) Chrome incognito mode, 2) Different network/wifi, 3) Disable VPN, 4) Clear everything and restart browser.',
+            'why': 'Course outcomes depend on: 1) Course demand vs. capacity, 2) Your utility budget, 3) How you ranked courses, 4) Competition from other students. Pre-enrollment reduces budget by 20%.',
+            'broken': 'The system works as designed, though outcomes can be disappointing. When demand exceeds capacity, tough trade-offs happen. Focus on what you can control: Add/Drop preparation and advisor meetings.',
+            
+            // Rules and conditional enrollment
+            'conditional': 'Course Match doesn\'t support conditional enrollment (like "only take X if I get Y"). The system evaluates each course independently. Rank course combinations you prefer higher and alternatives lower.',
+            'if i get': 'Course Match can\'t handle "if/then" scenarios. It evaluates each course independently based on your rankings. For dependent courses, rank the combination you want most higher in your preferences.',
+            'dependent': 'For courses that depend on each other, Course Match can\'t link them. Prerequisites must be completed first. Corequisites need you to be enrolled in both. Have backup plans.',
+            'rules': 'The only rule available is "assign me no more than X of these courses" - useful for multiple sections of the same course. Course Match doesn\'t support conditional rules like "only if I get another course."',
+            'prerequisite': 'Course Match evaluates each course independently - it can\'t guarantee you\'ll get prerequisites together. Rank your ideal combination high, but prepare for possibly getting only one.',
+            'together': 'Want two courses together? Course Match can\'t guarantee it, but ranking them both high increases chances. Have backup plans - you might get one without the other.',
+            
+            // Time conflicts and scheduling
+            'conflict': 'You CAN rank courses with time conflicts! Course Match will only enroll you in one of the conflicting courses. BUT if a course conflicts with your core course, the system won\'t enroll you - cores take priority.',
+            'time conflict': 'Time conflicts are allowed when ranking! The system will only assign you one of the conflicting courses. Exception: Can\'t get a course that conflicts with your pre-enrolled core courses.',
+            'overlap': 'Course overlap/conflicts are OK to rank! Course Match will handle it by only giving you one. However, if it overlaps with a core course you\'re already enrolled in, you won\'t get it.',
+            'core conflict': 'Courses that conflict with your core courses won\'t be assigned to you. Core courses take priority as degree requirements. The system automatically blocks these conflicts.',
+            'schedule': 'View course schedules in Vergil (vergil.columbia.edu). Search for the course and click the title to see full details including days, times, and instructors. Check before ranking!',
+            'when submit': 'No advantage to submitting early! Course Match runs AFTER the window closes. You can edit rankings unlimited times until the deadline. Submit 24 hours early to avoid technical issues.',
+            'vergil': 'Vergil (vergil.columbia.edu) is where you check course schedules, NOT where you rank. Use it to see course times, instructors, and locations. Course Match ranking happens at coursematch.gsb.columbia.edu.',
+            'prerequisite': 'Prerequisites must be COMPLETED before taking a course. You cannot register for a course if you\'re still taking its prerequisite. For specific prerequisite questions, verify with coursematch@gsb.columbia.edu.',
+            'corequisite': 'Corequisites CAN be taken together, BUT Course Match won\'t assign a course unless you\'re already enrolled in its corequisite. For clarification on specific courses, email coursematch@gsb.columbia.edu.',
+            'currently taking': 'If you\'re currently taking a course, it does NOT count as completed for prerequisite purposes. You must have already finished prerequisites before the term starts. Verify specific cases at coursematch@gsb.columbia.edu.',
+            
+            // Missing courses
+            'cant see': 'Course not showing? Common reasons: 1) Conflicts with your core course schedule, 2) Application-only (apply directly to Center/Program), 3) Not open to your program, 4) Prerequisites not met. Check course pages for schedules. It might still be available during Add/Drop!',
+            'not showing': 'Missing courses usually mean: Time conflict with cores (check course pages), application-only course, program restrictions, or unmet prerequisites. Good news - it might open during Add/Drop pending space!',
+            'cant find': 'Can\'t find a course? It might: conflict with your cores, be application-only, have program restrictions, or require prerequisites. Always check the course pages for schedule info. Many restricted courses open during Add/Drop!',
+            'missing course': 'Course missing from Course Match? Check if it: 1) Conflicts with pre-enrolled cores, 2) Requires direct application, 3) Is restricted to other programs, 4) Has prerequisites. For specific help, email coursematch@gsb.columbia.edu.',
+            'not available': 'Course not available? Could be: schedule conflict with cores, application-only status, program restrictions, or prerequisites. Check course pages for times. Even if not in Course Match, try during Add/Drop - spaces often open!',
+            
+            // Default
+            'default': 'I can help with Course Match questions! Try asking about: rankings, missing courses, time conflicts, prerequisites, results, browser issues, or specific problems. For official clarification, always email coursematch@gsb.columbia.edu. What would you like to know?'
+        };
+
+        function toggleChat() {
+            const chatWindow = document.getElementById('chatWindow');
+            chatWindow.classList.toggle('active');
+            
+            // Focus on input when opened
+            if (chatWindow.classList.contains('active')) {
+                document.getElementById('chatInput').focus();
+            }
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
+            if (!text) return;
+            
+            // Add user message
+            addMessage(text, 'user');
+            input.value = '';
+            
+            // Generate bot response after a short delay
+            setTimeout(() => {
+                const response = getBotResponse(text);
+                addMessage(response, 'bot');
+            }, 500);
+        }
+
+        function sendQuickReply(text) {
+            // Add user message
+            addMessage(text, 'user');
+            
+            // Generate bot response
+            setTimeout(() => {
+                const response = getBotResponse(text);
+                addMessage(response, 'bot');
+            }, 500);
+        }
+
+        function addMessage(text, sender) {
+            const chatBody = document.getElementById('chatBody');
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `message ${sender}`;
+            
+            if (sender === 'bot') {
+                msgDiv.innerHTML = `
+                    <div class="bot-avatar">🤖</div>
+                    <div class="msg-bubble">${text}</div>
+                `;
+            } else {
+                msgDiv.innerHTML = `<div class="msg-bubble">${text}</div>`;
+            }
+            
+            chatBody.appendChild(msgDiv);
+            chatBody.scrollTop = chatBody.scrollHeight;
+        }
+
+        function getBotResponse(text) {
+            const lowerText = text.toLowerCase();
+            
+            // Check each keyword/phrase
+            for (const [keyword, response] of Object.entries(chatResponses)) {
+                if (keyword !== 'default' && lowerText.includes(keyword)) {
+                    return response;
+                }
+            }
+            
+            // Return default if no match
+            return chatResponses.default;
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        // Scroll to top function (keep for other uses)
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        // Feedback popup functionality
+        function closeFeedbackPopup() {
+            document.getElementById('feedbackPopup').style.display = 'none';
+            localStorage.setItem('courseMatchFeedbackShown', 'true');
+        }
+        
+        // Show feedback popup after 3 minutes
+        setTimeout(function() {
+            const feedbackShown = localStorage.getItem('courseMatchFeedbackShown');
+            if (!feedbackShown) {
+                const popup = document.getElementById('feedbackPopup');
+                if (popup) {
+                    popup.style.display = 'block';
+                }
+            }
+        }, 180000); // 3 minutes
+    </script>
+    
+    <!-- Footer -->
+    <div style="background: #f8f9fa; border-top: 2px solid #e0e0e0; margin-top: 60px; padding: 30px 0;">
+        <div class="container" style="text-align: center; color: #666;">
+            <p style="font-size: 0.9em; line-height: 1.6;">
+                Based on "A Guide to Course Match at Columbia Business School" by the CBS Office of Records and Registration<br>
+                Created by administrators to help students navigate Course Match<br>
+                This is an <strong>unofficial</strong> educational resource • Always refer to official CBS sources for the most current information
+            </p>
+            <p style="margin-top: 15px; font-size: 0.9em;">
+                <strong>Questions or issues?</strong> Contact the team at <a href="mailto:coursematch@gsb.columbia.edu" style="color: #1976d2;">coursematch@gsb.columbia.edu</a>
+            </p>
+            <p style="margin-top: 10px; font-size: 0.85em;">
+                Course Match is property of Columbia Business School • For educational purposes only
+            </p>
+        </div>
+    </div>
+</body>
+</html>

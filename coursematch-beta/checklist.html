@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Match Preparation Checklist - CBS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+            color: #1a1a1a;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .progress-bar {
+            background: #e0e0e0;
+            height: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            width: 0%;
+            transition: width 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 15px;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+            position: relative;
+            min-width: 50px;
+        }
+
+        .checklist-section {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .checklist-section h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .timeline-badge {
+            background: #667eea;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+
+        .checklist {
+            list-style: none;
+        }
+
+        .checklist-item {
+            padding: 15px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .checklist-item:hover {
+            background: #e8f4f8;
+            transform: translateX(5px);
+        }
+
+        .checklist-item.checked {
+            background: #d4edda;
+            opacity: 0.8;
+        }
+
+        .checkbox {
+            width: 24px;
+            height: 24px;
+            border: 3px solid #667eea;
+            border-radius: 5px;
+            flex-shrink: 0;
+            margin-top: 2px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .checkbox::after {
+            content: '✓';
+            position: absolute;
+            top: -2px;
+            left: 4px;
+            font-size: 18px;
+            color: #28a745;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .checklist-item.checked .checkbox {
+            background: #28a745;
+            border-color: #28a745;
+        }
+
+        .checklist-item.checked .checkbox::after {
+            opacity: 1;
+            color: white;
+        }
+
+        .checklist-content {
+            flex: 1;
+        }
+
+        .checklist-title {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 5px;
+            line-height: 1.4;
+        }
+
+        .checklist-desc {
+            color: #666;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        .priority-high {
+            border-left: 4px solid #e74c3c;
+        }
+
+        .priority-medium {
+            border-left: 4px solid #f39c12;
+        }
+
+        .priority-low {
+            border-left: 4px solid #3498db;
+        }
+
+        .tips-box {
+            background: #e8f4f8;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+
+        .tips-box h4 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .tips-box ul {
+            padding-left: 20px;
+            margin: 0;
+        }
+        
+        .tips-box li {
+            margin-bottom: 8px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .warning-banner {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .warning-banner strong {
+            color: #856404;
+        }
+
+        @media print {
+            /* Reset and hide non-essential elements */
+            * {
+                margin: 0;
+                padding: 0;
+                box-shadow: none !important;
+            }
+            
+            body {
+                background: white;
+                font-size: 11pt;
+                line-height: 1.3;
+                color: #000;
+            }
+            
+            /* Hide everything we don't need */
+            .header, .progress-container, .action-buttons, 
+            .nav-buttons, .footer-note, .timeline-badge {
+                display: none !important;
+            }
+            
+            /* Main container simplified */
+            .container {
+                max-width: 100%;
+                padding: 0.5in;
+                margin: 0;
+            }
+            
+            /* Add title for print */
+            .container:before {
+                content: "Course Match Preparation Checklist";
+                display: block;
+                font-size: 18pt;
+                font-weight: bold;
+                text-align: center;
+                margin-bottom: 0.3in;
+            }
+            
+            /* Compact section layout */
+            .checklist-section {
+                margin-bottom: 0.2in;
+                padding: 0;
+                border: none;
+                page-break-inside: avoid;
+            }
+            
+            .checklist-section h2 {
+                font-size: 12pt;
+                margin-bottom: 0.1in;
+                padding-bottom: 2pt;
+                border-bottom: 1px solid #333;
+            }
+            
+            /* Ultra-compact checklist items */
+            .checklist-item {
+                display: flex;
+                padding: 2pt 0;
+                margin: 0;
+                background: none;
+                border: none;
+                page-break-inside: avoid;
+            }
+            
+            .checkbox {
+                width: 12pt;
+                height: 12pt;
+                border: 1.5pt solid #000;
+                flex-shrink: 0;
+                margin-right: 8pt;
+                margin-top: 2pt;
+            }
+            
+            .checkbox::after {
+                display: none;
+            }
+            
+            .checklist-content {
+                flex: 1;
+            }
+            
+            .checklist-title {
+                font-weight: bold;
+                font-size: 10pt;
+                margin: 0;
+            }
+            
+            .checklist-desc {
+                font-size: 9pt;
+                color: #333;
+                margin: 0;
+            }
+            
+            /* Remove all decorative elements */
+            .priority-high, .priority-medium {
+                border: none !important;
+                padding-left: 0 !important;
+            }
+            
+            /* Force single column layout */
+            .checklist {
+                columns: 1 !important;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 10px;
+            }
+            
+            .checklist-item {
+                padding: 12px;
+            }
+            
+            /* Fix bullet points on mobile */
+            .tips-box ul {
+                padding-left: 30px;
+                margin-left: 0;
+                list-style: disc outside;
+            }
+            
+            .tips-box li {
+                padding-left: 5px;
+                text-align: left;
+                list-style-type: disc;
+                display: list-item;
+            }
+            
+            /* Webkit-specific fix for iOS Safari */
+            .tips-box li::before {
+                content: "";
+                display: none;
+            }
+            
+            /* Alternative bullet solution if native bullets fail */
+            @supports (-webkit-touch-callout: none) {
+                .tips-box li {
+                    list-style: none;
+                    position: relative;
+                    padding-left: 20px;
+                }
+                
+                .tips-box li::before {
+                    content: "•";
+                    display: block;
+                    position: absolute;
+                    left: 0;
+                    top: 0;
+                    color: #2c3e50;
+                    font-size: 1.2em;
+                    line-height: 1.2;
+                }
+            }
+            
+            /* Ensure all lists display properly on mobile */
+            ul {
+                padding-left: 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📋 Course Match Preparation Checklist</h1>
+        <p class="subtitle">Your complete guide to a successful Course Match experience</p>
+
+        <div class="warning-banner">
+            <strong>⏰ Important:</strong> Always check the official CBS Course Match Calendar for your specific ranking window dates. Deadlines are at 4:00 PM EST. Submit at least 24 hours early!
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressBar">0%</div>
+        </div>
+
+        <!-- Early Preparation Section -->
+        <div class="checklist-section">
+            <h2>
+                <span>📅</span>
+                <span>Early Preparation</span>
+                <span class="timeline-badge">Start Here</span>
+            </h2>
+            
+            <ul class="checklist">
+                <li class="checklist-item priority-high" onclick="toggleCheck(this)">
+                    <div class="checkbox"></div>
+                    <div class="checklist-content">
+                        <div class="checklist-title">Check the official Course Match calendar</div>
+                        <div class="checklist-desc">Visit CBS website to confirm your ranking window dates and deadlines</div>
+                    </div>
+                </li>
+                
+                <li class="checklist-item priority-high" onclick="toggleCheck(this)">
+                    <div class="checkbox"></div>
+                    <div class="checklist-content">
+                        <div class="checklist-title">Check for registration holds</div>
+                        <div class="checklist-desc">Visit Student Services. Common holds: immunization, financial, academic advising</div>
+                    </div>
+                </li>
+                
+                <li class="checklist-item priority-high" onclick="toggleCheck(this)">
+                    <div class="checkbox"></div>
+                    <div class="checklist-content">
+                        <div class="checklist-title">Meet with your academic advisor</div>
+                        <div class="checklist-desc">Discuss degree requirements, recommended courses, and your academic plan</div>
+                    </div>
+                </li>
+                
+                <li class="checklist-item priority-medium" onclick="toggleCheck(this)">
+                    <div class="checkbox"></div>
+                    <div class="checklist-content">
+                        <div class="checklist-title">Review course offerings</div>
+                        <div class="checklist-desc">Browse course catalog, check meeting times, read descriptions</div>
+                    </div>
+                </li>
+                
+                <li class="checklist-item priority-medium" onclick="toggleCheck(this)">
+                    <div class="checkbox"></div>
+                    <div class="checklist-content">
+                        <div class="checklist-title">Check prerequisites</div>
+                        <div class="checklist-desc">Ensure you meet requirements for courses you're interested in</div>
+                    </div>
+                </li>
+                
+                <li class="checklist-item priority-low" onclick="toggleCheck(this)">
+                    <div class="checkbox"></div>
+                    <div class="checklist-content">
+                        <div class="checklist-title">Research professors</div>
+                        <div class="checklist-desc">Check ratings, teaching styles, and course workload</div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Before Ranking Opens Section -->
+        <div class="checklist-section">
+            <h2>
+                <span>📝</span>
+                <span>Before Ranking Opens</span>
+                <span class="timeline-badge">Prepare</span>
+            </h2>
+            
+            <ul class="checklist">
+                <li class="checklist-item priority-high" onclick="toggleCheck(this)">
+                    <div class="checkbox"></div>
+                    <div class="checklist-content">
+                        <div class="checklist-title">Determine your target credits</div>
+                        <div class="checklist-desc">Remember: Use 1.5 increments (12.0, 13.5, 15.0, etc.)</div>
+                    </div>
+                </li>
+                
+                <li class="checklist-item priority-high" onclick="toggleCheck(this)">
+                    <div class="checkbox"></div>
+                    <div class="checklist-content">
+                        <div class="checklist-title">Create your course list</div>
+                        <div class="checklist-desc">List 2x your target credits worth of courses (30 credits if taking 15)</div>
+                    </div>
+                </li>
+                
+                <li class="checklist-item priority-medium" onclick="toggleCheck(this)">
+                    <div class="checkbox"></div>
+                    <div class="checklist-content">
+                        <div class="checklist-title">Check time conflicts</div>
+                        <div class="checklist-desc">Map out potential schedule conflicts between courses</div>
+                    </div>
+                </li>
+                
+                <li class="checklist-item priority-medium" onclick="toggleCheck(this)">
+                    <div class="checkbox"></div>
+                    <div class="checklist-content">
+                        <div class="checklist-title">Identify backup courses</div>
+                        <div class="checklist-desc">Have "safety" options you'd be satisfied with</div>
+                    </div>
+                </li>
+                
+                <li class="checklist-item priority-low" onclick="toggleCheck(this)">
+                    <div class="checkbox"></div>
+                    <div class="checklist-content">
+                        <div class="checklist-title">Review historical data</div>
+                        <div class="checklist-desc">Check which courses were highly competitive in past terms</div>
+                    </div>
+                </li>
+            </ul>
+            
+            <div class="tips-box">
+                <h4>💡 Planning Tips</h4>
+                <ul>
+                    <li>Mix core requirements with electives</li>
+                    <li>Consider workload balance across the week</li>
+                    <li>Include courses with different assessment styles</li>
+                    <li>Don't rank more than 25 courses total</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- When Ranking Opens Section -->
+        <div class="checklist-section">
+            <h2>
+                <span>🚀</span>
+                <span>When Ranking Opens</span>
+                <span class="timeline-badge">Action Time</span>
+            </h2>
+            
+            <ul class="checklist">
+                <li class="checklist-item priority-high" onclick="toggleCheck(this)">
+                    <div class="checkbox"></div>
+                    <div class="checklist-content">
+                        <div class="checklist-title">Use Chrome or Firefox browser</div>
+                        <div class="checklist-desc">NOT Safari - it has compatibility issues</div>
+                    </div>
+                </li>
+                
+                <li class="checklist-item priority-high" onclick="toggleCheck(this)">
+                    <div class="checkbox"></div>
+                    <div class="checklist-content">
+                        <div class="checklist-title">Log in to coursematch.gsb.columbia.edu</div>
+                        <div class="checklist-desc">Use your UNI and password</div>
+                    </div>
+                </li>
+                
+                <li class="checklist-item priority-high" onclick="toggleCheck(this)">
+                    <div class="checkbox"></div>
+                    <div class="checklist-content">
+                        <div class="checklist-title">Set your target credits</div>
+                        <div class="checklist-desc">Must be in 1.5 increments (e.g., 12.0, 13.5, 15.0)</div>
+                    </div>
+                </li>
+                
+                <li class="checklist-item priority-high" onclick="toggleCheck(this)">
+                    <div class="checkbox"></div>
+                    <div class="checklist-content">
+                        <div class="checklist-title">Add courses to your selection</div>
+                        <div class="checklist-desc">Search and add ~2x your target credits worth</div>
+                    </div>
+                </li>
+                
+                <li class="checklist-item priority-high" onclick="toggleCheck(this)">
+                    <div class="checkbox"></div>
+                    <div class="checklist-content">
+                        <div class="checklist-title">Rank courses in buckets</div>
+                        <div class="checklist-desc">Favorite (1 only), Great, Good, Acceptable</div>
+                    </div>
+                </li>
+                
+                <li class="checklist-item priority-medium" onclick="toggleCheck(this)">
+                    <div class="checkbox"></div>
+                    <div class="checklist-content">
+                        <div class="checklist-title">Order within each bucket</div>
+                        <div class="checklist-desc">Drag to arrange preferences within buckets</div>
+                    </div>
+                </li>
+                
+                <li class="checklist-item priority-medium" onclick="toggleCheck(this)">
+                    <div class="checkbox"></div>
+                    <div class="checklist-content">
+                        <div class="checklist-title">Review preview schedules</div>
+                        <div class="checklist-desc">Check the 8 possible schedules shown</div>
+                    </div>
+                </li>
+                
+                <li class="checklist-item priority-low" onclick="toggleCheck(this)">
+                    <div class="checkbox"></div>
+                    <div class="checklist-content">
+                        <div class="checklist-title">Add Rules if needed</div>
+                        <div class="checklist-desc">For substitute courses (e.g., multiple sections)</div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Before Deadline Section -->
+        <div class="checklist-section">
+            <h2>
+                <span>⏰</span>
+                <span>24 Hours Before Deadline</span>
+                <span class="timeline-badge">Critical</span>
+            </h2>
+            
+            <ul class="checklist">
+                <li class="checklist-item priority-high" onclick="toggleCheck(this)">
+                    <div class="checkbox"></div>
+                    <div class="checklist-content">
+                        <div class="checklist-title">SUBMIT YOUR RANKINGS</div>
+                        <div class="checklist-desc">Don't wait until the last minute! System can get overloaded</div>
+                    </div>
+                </li>
+                
+                <li class="checklist-item priority-high" onclick="toggleCheck(this)">
+                    <div class="checkbox"></div>
+                    <div class="checklist-content">
+                        <div class="checklist-title">Screenshot your final rankings</div>
+                        <div class="checklist-desc">Keep a record of what you submitted</div>
+                    </div>
+                </li>
+                
+                <li class="checklist-item priority-medium" onclick="toggleCheck(this)">
+                    <div class="checkbox"></div>
+                    <div class="checklist-content">
+                        <div class="checklist-title">Double-check bucket assignments</div>
+                        <div class="checklist-desc">Ensure courses are in the right priority buckets</div>
+                    </div>
+                </li>
+                
+                <li class="checklist-item priority-medium" onclick="toggleCheck(this)">
+                    <div class="checkbox"></div>
+                    <div class="checklist-content">
+                        <div class="checklist-title">Verify submission confirmation</div>
+                        <div class="checklist-desc">Look for the confirmation message/email</div>
+                    </div>
+                </li>
+            </ul>
+            
+            <div class="tips-box">
+                <h4>🚨 Last-Minute Reminders</h4>
+                <ul>
+                    <li>Deadline is 4:00 PM EST (not midnight!)</li>
+                    <li>You can change rankings unlimited times until deadline</li>
+                    <li>Only your final submission counts</li>
+                    <li>System may be slow near deadline - submit early!</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- After Results Section -->
+        <div class="checklist-section">
+            <h2>
+                <span>📊</span>
+                <span>After Results Are Released</span>
+                <span class="timeline-badge">Follow-up</span>
+            </h2>
+            
+            <ul class="checklist">
+                <li class="checklist-item priority-high" onclick="toggleCheck(this)">
+                    <div class="checkbox"></div>
+                    <div class="checklist-content">
+                        <div class="checklist-title">Check your assigned schedule</div>
+                        <div class="checklist-desc">Results typically released 24-48 hours after deadline</div>
+                    </div>
+                </li>
+                
+                <li class="checklist-item priority-high" onclick="toggleCheck(this)">
+                    <div class="checkbox"></div>
+                    <div class="checklist-content">
+                        <div class="checklist-title">Join waitlists strategically</div>
+                        <div class="checklist-desc">CBS typically allows max 3 waitlists</div>
+                    </div>
+                </li>
+                
+                <li class="checklist-item priority-medium" onclick="toggleCheck(this)">
+                    <div class="checkbox"></div>
+                    <div class="checklist-content">
+                        <div class="checklist-title">Attend ALL first classes</div>
+                        <div class="checklist-desc">Including waitlisted courses - professors often add students</div>
+                    </div>
+                </li>
+                
+                <li class="checklist-item priority-medium" onclick="toggleCheck(this)">
+                    <div class="checkbox"></div>
+                    <div class="checklist-content">
+                        <div class="checklist-title">Prepare for Add/Drop</div>
+                        <div class="checklist-desc">Have backup plans ready for the 2-week Add/Drop period</div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <div class="action-buttons">
+            <button class="action-btn btn-primary" onclick="window.print()">
+                🖨️ Print Checklist
+            </button>
+            <button class="action-btn btn-primary" onclick="savePDF()">
+                📄 Save as PDF
+            </button>
+            <a href="tutorial.html" class="action-btn btn-secondary">
+                📚 Back to Tutorial
+            </a>
+            <a href="index.html" class="action-btn btn-secondary">
+                🏠 Home
+            </a>
+        </div>
+    </div>
+
+    <script>
+        function toggleCheck(item) {
+            item.classList.toggle('checked');
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const total = document.querySelectorAll('.checklist-item').length;
+            const checked = document.querySelectorAll('.checklist-item.checked').length;
+            const percentage = Math.round((checked / total) * 100);
+            
+            const progressBar = document.getElementById('progressBar');
+            progressBar.style.width = Math.max(percentage, 10) + '%'; // Minimum 10% width
+            progressBar.textContent = percentage + '%';
+            
+            // If percentage is very low, adjust text color for visibility
+            if (percentage < 20) {
+                progressBar.style.color = '#667eea';
+                progressBar.style.paddingRight = '5px';
+            } else {
+                progressBar.style.color = 'white';
+                progressBar.style.paddingRight = '15px';
+            }
+            
+            // Save progress to localStorage
+            saveProgress();
+        }
+
+        function saveProgress() {
+            const checkedItems = [];
+            document.querySelectorAll('.checklist-item').forEach((item, index) => {
+                if (item.classList.contains('checked')) {
+                    checkedItems.push(index);
+                }
+            });
+            localStorage.setItem('courseMatchChecklist', JSON.stringify(checkedItems));
+        }
+
+        function loadProgress() {
+            const saved = localStorage.getItem('courseMatchChecklist');
+            if (saved) {
+                const checkedItems = JSON.parse(saved);
+                const items = document.querySelectorAll('.checklist-item');
+                checkedItems.forEach(index => {
+                    if (items[index]) {
+                        items[index].classList.add('checked');
+                    }
+                });
+                updateProgress();
+            }
+        }
+
+        // Load saved progress on page load
+        window.addEventListener('DOMContentLoaded', loadProgress);
+        
+        function savePDF() {
+            // First trigger print dialog
+            window.print();
+            
+            // Show helpful message after a short delay
+            setTimeout(() => {
+                const message = `💡 To save as PDF:\n\n` +
+                    `1. In the print dialog, look for "Destination" or "Printer"\n` +
+                    `2. Select "Save as PDF" or "Microsoft Print to PDF"\n` +
+                    `3. Choose your save location and click "Save"\n\n` +
+                    `Your checklist will be saved as a clean, single-page PDF!`;
+                alert(message);
+            }, 100);
+        }
+    </script>
+    
+    <!-- Footer -->
+    <div style="background: #f8f9fa; border-top: 2px solid #e0e0e0; margin-top: 60px; padding: 30px 0;">
+        <div class="container" style="text-align: center; color: #666; font-size: 0.9em;">
+            <p>Based on materials from the CBS Office of Records and Registration</p>
+            <p>This is an <strong>unofficial</strong> educational resource • Course Match is property of Columbia Business School</p>
+            <p style="margin-top: 10px;">Questions? Contact: <a href="mailto:coursematch@gsb.columbia.edu" style="color: #1976d2;">coursematch@gsb.columbia.edu</a></p>
+        </div>
+    </div>
+</body>
+</html>
