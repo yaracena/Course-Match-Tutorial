@@ -1,0 +1,2270 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Advanced Course Match Strategy Tool</title>
+    <style>
+      :root {
+        --primary: #4e54c8;
+        --secondary: #8f94fb;
+        --accent: #ff6b6b;
+        --bg-light: #f4f7f6;
+        --text-dark: #333;
+        --danger: #ffebee;
+        --danger-text: #c62828;
+        --warning: #fff3e0;
+        --warning-text: #e65100;
+        --success: #e8f5e9;
+        --success-text: #2e7d32;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: 'Segoe UI', system-ui, sans-serif;
+      }
+
+      body {
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 1400px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        overflow: hidden;
+        display: grid;
+        grid-template-rows: auto 1fr;
+        min-height: 90vh;
+      }
+
+      /* Header & Controls */
+      header {
+        background: white;
+        padding: 25px 40px;
+        border-bottom: 1px solid #eee;
+      }
+
+      .header-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+      h1 {
+        color: var(--primary);
+        font-size: 1.8rem;
+      }
+
+      .controls {
+        display: flex;
+        gap: 20px;
+        background: var(--bg-light);
+        padding: 15px;
+        border-radius: 10px;
+        flex-wrap: wrap;
+      }
+
+      .control-group {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      label {
+        font-weight: 600;
+        color: #555;
+        font-size: 0.9rem;
+      }
+
+      select,
+      button.toggle-btn {
+        padding: 8px 16px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        background: white;
+        cursor: pointer;
+        font-size: 0.95rem;
+      }
+
+      button.toggle-btn.active {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+      }
+
+      /* Main Layout */
+      .main-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        height: 100%;
+        overflow: hidden;
+      }
+
+      @media (max-width: 900px) {
+        .main-grid {
+          grid-template-columns: 1fr;
+          overflow-y: auto;
+        }
+      }
+
+      /* Left Column: Marketplace */
+      .marketplace {
+        padding: 30px;
+        border-right: 1px solid #eee;
+        overflow-y: auto;
+        background: #fafafa;
+        height: 100%; /* Ensure scroll */
+        max-height: 80vh;
+      }
+
+      .search-bar {
+        width: 100%;
+        padding: 15px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 1rem;
+        margin-bottom: 20px;
+        transition: border-color 0.2s;
+      }
+      .search-bar:focus {
+        outline: none;
+        border-color: var(--primary);
+      }
+
+      .course-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .course-card {
+        background: white;
+        padding: 15px;
+        border-radius: 8px;
+        border: 1px solid #eee;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+        transition: transform 0.1s, box-shadow 0.1s;
+      }
+      .course-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+      }
+
+      .course-info h4 {
+        font-size: 1rem;
+        margin-bottom: 4px;
+        color: var(--text-dark);
+      }
+      .course-info p {
+        font-size: 0.85rem;
+        color: #666;
+      }
+      .course-meta {
+        text-align: right;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 5px;
+      }
+
+      .badge {
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+      }
+      .badge-high {
+        background: var(--danger);
+        color: var(--danger-text);
+      }
+      .badge-medium {
+        background: var(--warning);
+        color: var(--warning-text);
+      }
+      .badge-low {
+        background: var(--success);
+        color: var(--success-text);
+      }
+
+      /* Right Column: Strategy Board */
+      .strategy-board {
+        padding: 30px;
+        background: white;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        max-height: 80vh;
+        overflow-y: auto;
+      }
+
+      .stats-panel {
+        background: var(--bg-light);
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: space-between;
+      }
+      .stat-item {
+        text-align: center;
+      }
+      .stat-val {
+        display: block;
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: var(--primary);
+      }
+      .stat-label {
+        font-size: 0.8rem;
+        color: #666;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .ranking-list {
+        flex-grow: 1;
+        overflow-y: auto;
+        margin-bottom: 20px;
+        counter-reset: rank;
+      }
+
+      .rank-item {
+        display: flex;
+        align-items: center;
+        background: white;
+        border: 1px solid #e0e0e0;
+        margin-bottom: 8px;
+        border-radius: 8px;
+        padding: 10px;
+        transition: all 0.2s;
+      }
+
+      .rank-number {
+        width: 30px;
+        height: 30px;
+        background: var(--primary);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 0.9rem;
+        margin-right: 10px;
+      }
+
+      .rank-item.warning-rank {
+        border-left: 4px solid var(--warning-text);
+      }
+      .rank-item.danger-rank {
+        border-left: 4px solid var(--danger-text);
+      }
+
+      .rank-content {
+        flex-grow: 1;
+      }
+      .rank-content h5 {
+        margin-bottom: 2px;
+      }
+      .rank-controls {
+        display: flex;
+        gap: 5px;
+        margin-left: 10px;
+      }
+
+      .btn-sm {
+        border: none;
+        background: #f0f0f0;
+        width: 28px;
+        height: 28px;
+        border-radius: 4px;
+        cursor: pointer;
+        color: #555;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .btn-sm:hover {
+        background: #e0e0e0;
+      }
+      .btn-remove {
+        background: var(--danger);
+        color: var(--danger-text);
+      }
+
+      /* Insights Panel */
+      .insights-panel {
+        border-top: 2px solid #eee;
+        padding-top: 20px;
+      }
+      .insight-card {
+        padding: 12px;
+        border-radius: 6px;
+        margin-bottom: 10px;
+        font-size: 0.9rem;
+        line-height: 1.4;
+        border-left: 4px solid #ccc;
+      }
+      .insight-info {
+        background: #e3f2fd;
+        border-color: #2196f3;
+        color: #0c5460;
+      }
+      .insight-warn {
+        background: #fff3cd;
+        border-color: #ffc107;
+        color: #856404;
+      }
+      .insight-crit {
+        background: #f8d7da;
+        border-color: #dc3545;
+        color: #721c24;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <div class="header-top">
+          <h1>🎯 Course Match Strategy Advisor</h1>
+        </div>
+        <div class="controls">
+          <div class="control-group">
+            <label>Program:</label>
+            <button class="toggle-btn active" id="btnMBA" onclick="setProgram('mba')">MBA</button>
+            <button class="toggle-btn" id="btnEMBA" onclick="setProgram('emba')">EMBA</button>
+          </div>
+          <div class="control-group">
+            <label>Your Year:</label>
+            <select id="yearSelect" onchange="updateUI()">
+              <option value="first_year">1st Year</option>
+              <option value="second_year">2nd Year / Graduating</option>
+            </select>
+          </div>
+          <div class="control-group" style="margin-left: auto">
+            <label>Total Credits:</label>
+            <span style="font-weight: bold; font-size: 1.1rem; color: var(--primary)" id="headerCredits">0.0</span>
+          </div>
+        </div>
+      </header>
+
+      <div class="main-grid">
+        <div class="marketplace">
+          <input
+            type="text"
+            class="search-bar"
+            id="searchInput"
+            placeholder="🔍 Search courses..."
+            onkeyup="renderMarketplace()"
+          />
+          <div id="courseListContainer" class="course-list"></div>
+        </div>
+
+        <div class="strategy-board">
+          <div class="stats-panel">
+            <div class="stat-item">
+              <span class="stat-val" id="countVal">0</span>
+              <span class="stat-label">Courses</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-val" id="creditsVal">0.0</span>
+              <span class="stat-label">Credits</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-val" id="riskVal">--</span>
+              <span class="stat-label">Portfolio Risk</span>
+            </div>
+          </div>
+
+          <h3 style="margin-bottom: 15px; color: #444">🏆 Priority Ranking</h3>
+          <p style="font-size: 0.85rem; color: #888; margin-bottom: 15px">
+            Rank matters! The algorithm processes #1 before #2.
+          </p>
+
+          <div id="rankingList" class="ranking-list">
+            <div style="text-align: center; padding: 40px; color: #999">
+              Select courses from the left to begin ranking.
+            </div>
+          </div>
+
+          <div class="insights-panel" id="insightsPanel"></div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // --- 1. DATA PREPARATION ---
+      // We add 'credits' (default 3, half-term 1.5) and structure the tier data
+
+      const DB = {
+        mba: [
+          {
+            code: 'ACCTB8007',
+            name: 'Financial Planning & Analysis',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.2 },
+            first_year: { tier: 'medium', ratio: 1.2 },
+          },
+          {
+            code: 'ACCTB8008',
+            name: 'Earnings Quality & Fundamental Analysis',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 2.2 },
+            first_year: { tier: 'medium', ratio: 2.2 },
+          },
+          {
+            code: 'ACCTB8009',
+            name: 'Financial Statement Analysis and Valuation',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.9 },
+            first_year: { tier: 'medium', ratio: 1.9 },
+          },
+          {
+            code: 'ACCTB8010',
+            name: 'Fundamental Analysis for Investors, Managers and Entrepreneurs',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 2.3 },
+            first_year: { tier: 'medium', ratio: 2.3 },
+          },
+          {
+            code: 'ACCTB8019',
+            name: 'Corporate Transactions and Financial Modelling',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.8 },
+            first_year: { tier: 'medium', ratio: 1.8 },
+          },
+          {
+            code: 'ACCTB8026',
+            name: 'Applied Fundamental Analysis with Alternative Data',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.0 },
+            first_year: { tier: 'medium', ratio: 1.0 },
+          },
+          {
+            code: 'ACCTB8027',
+            name: 'Sustainability Reporting',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.4 },
+            first_year: { tier: 'medium', ratio: 1.4 },
+          },
+          {
+            code: 'ACCTB8030',
+            name: 'LBO & Bankruptcy Transactions',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 0.1 },
+            first_year: { tier: 'medium', ratio: 0.1 },
+          },
+          {
+            code: 'ACCTB8122',
+            name: 'Accounting for Consultants',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.5 },
+            first_year: { tier: 'medium', ratio: 1.5 },
+          },
+          {
+            code: 'BUECB8212',
+            name: 'Climate Policy',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.5 },
+            first_year: { tier: 'medium', ratio: 1.5 },
+          },
+          {
+            code: 'BUECB8213',
+            name: 'Global Macroeconomic Investing',
+            credits: 3.0,
+            second_year: { tier: 'low', ratio: 1.1 },
+            first_year: { tier: 'low', ratio: 1.1 },
+          },
+          {
+            code: 'BUECB8216',
+            name: 'Economics of Strategic Behavior',
+            credits: 3.0,
+            second_year: { tier: 'low', ratio: 1.3 },
+            first_year: { tier: 'low', ratio: 1.3 },
+          },
+          {
+            code: 'BUECB8225',
+            name: 'Structural Disruptions in the Global Economy',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.7 },
+            first_year: { tier: 'medium', ratio: 1.7 },
+          },
+          {
+            code: 'BUECB8233',
+            name: 'Climate Risk',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.8 },
+            first_year: { tier: 'medium', ratio: 1.8 },
+          },
+          {
+            code: 'BUECB8250',
+            name: 'Macroeconomic Policy',
+            credits: 3.0,
+            second_year: { tier: 'low', ratio: 1.4 },
+            first_year: { tier: 'low', ratio: 1.4 },
+          },
+          {
+            code: 'BUECB8251',
+            name: 'Financial Markets and the Macroeconomy',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.7 },
+            first_year: { tier: 'medium', ratio: 1.7 },
+          },
+          {
+            code: 'BUECB8257',
+            name: 'Business Experiments: Analytics for Causal Insights',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.3 },
+            first_year: { tier: 'medium', ratio: 1.3 },
+          },
+          {
+            code: 'BUECB8263',
+            name: 'Anti-Trust in the Modern Economy',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.9 },
+            first_year: { tier: 'medium', ratio: 1.9 },
+          },
+          {
+            code: 'BUECB8265',
+            name: 'Modern Political Economy',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 2.5 },
+            first_year: { tier: 'medium', ratio: 2.5 },
+          },
+          {
+            code: 'BUECB8315',
+            name: 'Game Theory and Business',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.0 },
+            first_year: { tier: 'medium', ratio: 1.0 },
+          },
+          {
+            code: 'BUECB8366',
+            name: 'Media and Technology Industries: Public Policy and Business Strategy',
+            credits: 3.0,
+            second_year: { tier: 'high', ratio: 3.9 },
+            first_year: { tier: 'high', ratio: 3.9 },
+          },
+          {
+            code: 'BUECB8467',
+            name: 'The Economics and Politics of Digital Disruption',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.5 },
+            first_year: { tier: 'medium', ratio: 1.5 },
+          },
+          {
+            code: 'BUECB8498',
+            name: 'Mergers & Acquisitions in Media and Technology (Master Class)',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 5.9 },
+            first_year: { tier: 'high', ratio: 5.9 },
+          },
+          {
+            code: 'BUECB8776',
+            name: 'Blockchain, Cryptocurrencies and Digital Tokens Demystified',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.0 },
+            first_year: { tier: 'medium', ratio: 1.0 },
+          },
+          {
+            code: 'BUSIB8704',
+            name: 'Diversity, Equity, and Inclusion Foundations',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.1 },
+            first_year: { tier: 'medium', ratio: 1.1 },
+          },
+          {
+            code: 'BUSIB8705',
+            name: 'Business and Climate Change',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.6 },
+            first_year: { tier: 'medium', ratio: 1.6 },
+          },
+          {
+            code: 'BUSIB8707',
+            name: 'Global Immersion: Business and Entrepreneurship in Tunisia',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 2.5 },
+            first_year: { tier: 'medium', ratio: 2.5 },
+          },
+          {
+            code: 'BUSIB8708',
+            name: 'Global Immersion  Tech in Africa: Innovation and Entrepreneurship in Nairobi, Kenya',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 9.1 },
+            first_year: { tier: 'high', ratio: 9.1 },
+          },
+          {
+            code: 'BUSIB8710',
+            name: 'Global Immersion: Consulting and Advising Family Enterprises (CAFÉ) in Italy',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 2.0 },
+            first_year: { tier: 'high', ratio: 2.0 },
+          },
+          {
+            code: 'BUSIB8714',
+            name: 'Global Immersion: Doing Business in Brazil - Challenges & Opportunities',
+            credits: 3.0,
+            second_year: { tier: 'high', ratio: 5.8 },
+            first_year: { tier: 'high', ratio: 5.8 },
+          },
+          {
+            code: 'BUSIB8721',
+            name: 'Global Immersion: Innovation in India',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 2.8 },
+            first_year: { tier: 'medium', ratio: 2.8 },
+          },
+          {
+            code: 'BUSIB8772',
+            name: 'Global Immersion: Lessons from Rwanda on Conflict, Leadership, and Business Opportunities',
+            credits: 3.0,
+            second_year: { tier: 'high', ratio: 9.6 },
+            first_year: { tier: 'high', ratio: 9.6 },
+          },
+          {
+            code: 'BUSIB8777',
+            name: "Global Immersion: Philippines: Asia's Rising Tiger",
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 8.4 },
+            first_year: { tier: 'high', ratio: 8.4 },
+          },
+          {
+            code: 'BUSIB8778',
+            name: 'Global Immersion: South Africa’s Ongoing Transformation',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 7.1 },
+            first_year: { tier: 'high', ratio: 7.1 },
+          },
+          {
+            code: 'BUSIB8779',
+            name: 'Global Immersion: Development and Democracy: Digging into the Success of Ghana',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 5.9 },
+            first_year: { tier: 'medium', ratio: 5.9 },
+          },
+          {
+            code: 'BUSIB8780',
+            name: 'Global Immersion: Business and Entrepreneurship in Egypt',
+            credits: 3.0,
+            second_year: { tier: 'high', ratio: 5.8 },
+            first_year: { tier: 'high', ratio: 5.8 },
+          },
+          {
+            code: 'BUSIB8781',
+            name: 'Global Immersion: Foundations of VC in Japan',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 5.0 },
+            first_year: { tier: 'high', ratio: 5.0 },
+          },
+          {
+            code: 'BUSIB8784',
+            name: 'Business and Society: Reconciling Shareholder and Stakeholder Interests',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 2.2 },
+            first_year: { tier: 'medium', ratio: 2.2 },
+          },
+          {
+            code: 'DROMB8101',
+            name: 'Business Analytics II',
+            credits: 3.0,
+            second_year: { tier: 'low', ratio: 1.0 },
+            first_year: { tier: 'low', ratio: 1.0 },
+          },
+          {
+            code: 'DROMB8102',
+            name: 'Process Improvement & Growth',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 2.2 },
+            first_year: { tier: 'medium', ratio: 2.2 },
+          },
+          {
+            code: 'DROMB8103',
+            name: 'Business Analytics II: Foundations of AI',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.6 },
+            first_year: { tier: 'medium', ratio: 1.6 },
+          },
+          {
+            code: 'DROMB8106',
+            name: 'Operations Strategy (Full Term)',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.6 },
+            first_year: { tier: 'medium', ratio: 1.6 },
+          },
+          {
+            code: 'DROMB8107',
+            name: 'Service Operations Management',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.6 },
+            first_year: { tier: 'medium', ratio: 1.6 },
+          },
+          {
+            code: 'DROMB8109',
+            name: 'Supply Chain Management',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 0.6 },
+            first_year: { tier: 'medium', ratio: 0.6 },
+          },
+          {
+            code: 'DROMB8114',
+            name: 'Applied Regression Analysis',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.6 },
+            first_year: { tier: 'medium', ratio: 1.6 },
+          },
+          {
+            code: 'DROMB8115',
+            name: 'Leading Sustainable Supply Chains and Operations',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.2 },
+            first_year: { tier: 'medium', ratio: 1.2 },
+          },
+          {
+            code: 'DROMB8117',
+            name: 'Business Analytics 3: Modern AI, Deep Learning, and Generative AI',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.7 },
+            first_year: { tier: 'medium', ratio: 1.7 },
+          },
+          {
+            code: 'DROMB8125',
+            name: 'Digital Literacy for Decision Makers',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.5 },
+            first_year: { tier: 'medium', ratio: 1.5 },
+          },
+          {
+            code: 'DROMB8126',
+            name: 'Programming Generative AI Applications',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 2.8 },
+            first_year: { tier: 'high', ratio: 2.8 },
+          },
+          {
+            code: 'DROMB8128',
+            name: 'Healthcare Venture Capital And Private Equity: HCIT and Services',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.4 },
+            first_year: { tier: 'medium', ratio: 1.4 },
+          },
+          {
+            code: 'DROMB8131',
+            name: 'Sports Analytics',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 2.3 },
+            first_year: { tier: 'medium', ratio: 2.3 },
+          },
+          {
+            code: 'DROMB8132',
+            name: 'Investing in Digital Health Startups',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.5 },
+            first_year: { tier: 'medium', ratio: 1.5 },
+          },
+          {
+            code: 'DROMB8138',
+            name: 'Intro to Databases for Business Analytics',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 2.0 },
+            first_year: { tier: 'medium', ratio: 2.0 },
+          },
+          {
+            code: 'DROMB8139',
+            name: 'Data Analytics in Python',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 0.9 },
+            first_year: { tier: 'medium', ratio: 0.9 },
+          },
+          {
+            code: 'DROMB8144',
+            name: 'Introduction to Programming in R',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 0.7 },
+            first_year: { tier: 'medium', ratio: 0.7 },
+          },
+          {
+            code: 'DROMB8145',
+            name: 'Applying Healthcare IT and Digital Health',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.3 },
+            first_year: { tier: 'low', ratio: 1.3 },
+          },
+          {
+            code: 'DROMB8146',
+            name: 'Analytics in Action (Master Class)',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 3.7 },
+            first_year: { tier: 'medium', ratio: 3.7 },
+          },
+          {
+            code: 'DROMB8148',
+            name: 'The Analytics Advantage',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.4 },
+            first_year: { tier: 'medium', ratio: 1.4 },
+          },
+          {
+            code: 'DROMB8154',
+            name: 'Python for MBAs',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.8 },
+            first_year: { tier: 'medium', ratio: 1.8 },
+          },
+          {
+            code: 'DROMB8159',
+            name: 'Digital Marketplaces',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.8 },
+            first_year: { tier: 'medium', ratio: 1.8 },
+          },
+          {
+            code: 'DROMB8823',
+            name: 'The U.S. Healthcare System: Structure and Strategies',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.6 },
+            first_year: { tier: 'medium', ratio: 1.6 },
+          },
+          {
+            code: 'ECMRB8744',
+            name: 'The Psychology and Economics of Consumer Finance',
+            credits: 3.0,
+            second_year: { tier: 'low', ratio: 1.3 },
+            first_year: { tier: 'low', ratio: 1.3 },
+          },
+          {
+            code: 'FINCB8301',
+            name: 'The Case for Boring: Investing in Investment Grade',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.4 },
+            first_year: { tier: 'low', ratio: 1.4 },
+          },
+          {
+            code: 'FINCB8306',
+            name: 'Capital Markets & Investments',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 0.9 },
+            first_year: { tier: 'low', ratio: 0.9 },
+          },
+          {
+            code: 'FINCB8307',
+            name: 'Corporate Financial Management',
+            credits: 3.0,
+            second_year: { tier: 'low', ratio: 0.9 },
+            first_year: { tier: 'low', ratio: 0.9 },
+          },
+          {
+            code: 'FINCB8308',
+            name: 'Debt Markets',
+            credits: 3.0,
+            second_year: { tier: 'low', ratio: 1.4 },
+            first_year: { tier: 'low', ratio: 1.4 },
+          },
+          {
+            code: 'FINCB8309',
+            name: 'Derivatives',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.2 },
+            first_year: { tier: 'medium', ratio: 1.2 },
+          },
+          {
+            code: 'FINCB8313',
+            name: 'Hybrid Fund Investing: Crossing Over from Public to Private Markets (and Back Again)',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 4.0 },
+            first_year: { tier: 'high', ratio: 4.0 },
+          },
+          {
+            code: 'FINCB8318',
+            name: 'Investment Banking Tax Factors',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.0 },
+            first_year: { tier: 'low', ratio: 1.0 },
+          },
+          {
+            code: 'FINCB8323',
+            name: 'Asset Management',
+            credits: 3.0,
+            second_year: { tier: 'low', ratio: 0.7 },
+            first_year: { tier: 'low', ratio: 0.7 },
+          },
+          {
+            code: 'FINCB8324',
+            name: 'The Business of Asset Management',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 2.0 },
+            first_year: { tier: 'medium', ratio: 2.0 },
+          },
+          {
+            code: 'FINCB8325',
+            name: 'Mergers & Acquisitions',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 2.3 },
+            first_year: { tier: 'medium', ratio: 2.3 },
+          },
+          {
+            code: 'FINCB8328',
+            name: 'From Feast to Famine & Back Again: Investing in the Credit Markets through Cycles',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.8 },
+            first_year: { tier: 'medium', ratio: 1.8 },
+          },
+          {
+            code: 'FINCB8329',
+            name: 'Private Equity: Value Creation',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 3.1 },
+            first_year: { tier: 'medium', ratio: 3.1 },
+          },
+          {
+            code: 'FINCB8331',
+            name: 'Real Estate Finance',
+            credits: 3.0,
+            second_year: { tier: 'low', ratio: 1.0 },
+            first_year: { tier: 'low', ratio: 1.0 },
+          },
+          {
+            code: 'FINCB8332',
+            name: 'Real Estate Transactions',
+            credits: 3.0,
+            second_year: { tier: 'low', ratio: 1.0 },
+            first_year: { tier: 'low', ratio: 1.0 },
+          },
+          {
+            code: 'FINCB8334',
+            name: 'Capstone: Real Estate Investment',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 0.7 },
+            first_year: { tier: 'medium', ratio: 0.7 },
+          },
+          {
+            code: 'FINCB8335',
+            name: 'Private Equity Allocation',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 2.4 },
+            first_year: { tier: 'medium', ratio: 2.4 },
+          },
+          {
+            code: 'FINCB8337',
+            name: 'Global Real Estate Investment',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 0.9 },
+            first_year: { tier: 'medium', ratio: 0.9 },
+          },
+          {
+            code: 'FINCB8338',
+            name: 'Real Estate Development',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 0.8 },
+            first_year: { tier: 'medium', ratio: 0.8 },
+          },
+          {
+            code: 'FINCB8340',
+            name: 'Advanced Seminar in Real Estate',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.0 },
+            first_year: { tier: 'medium', ratio: 1.0 },
+          },
+          {
+            code: 'FINCB8343',
+            name: 'Private Equity Finance',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.9 },
+            first_year: { tier: 'medium', ratio: 1.9 },
+          },
+          {
+            code: 'FINCB8345',
+            name: 'Entrepreneurial Finance',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 2.0 },
+            first_year: { tier: 'medium', ratio: 2.0 },
+          },
+          {
+            code: 'FINCB8354',
+            name: 'Personal Finance',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 10.8 },
+            first_year: { tier: 'high', ratio: 10.8 },
+          },
+          {
+            code: 'FINCB8355',
+            name: 'Impact Investing',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 2.6 },
+            first_year: { tier: 'medium', ratio: 2.6 },
+          },
+          {
+            code: 'FINCB8356',
+            name: 'Financing Innovation in Healthcare',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.2 },
+            first_year: { tier: 'medium', ratio: 1.2 },
+          },
+          {
+            code: 'FINCB8357',
+            name: 'Activist Value Investing for Small Cap Companies',
+            credits: 3.0,
+            second_year: { tier: 'high', ratio: 5.0 },
+            first_year: { tier: 'high', ratio: 5.0 },
+          },
+          {
+            code: 'FINCB8358',
+            name: 'Strategic Equity Finance',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 3.4 },
+            first_year: { tier: 'medium', ratio: 3.4 },
+          },
+          {
+            code: 'FINCB8363',
+            name: 'Climate Finance',
+            credits: 3.0,
+            second_year: { tier: 'low', ratio: 1.0 },
+            first_year: { tier: 'low', ratio: 1.0 },
+          },
+          {
+            code: 'FINCB8368',
+            name: 'Security Analysis',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 3.3 },
+            first_year: { tier: 'high', ratio: 3.3 },
+          },
+          {
+            code: 'FINCB8369',
+            name: 'Applied Security Analysis I',
+            credits: 3.0,
+            second_year: { tier: 'low', ratio: 1.4 },
+            first_year: { tier: 'low', ratio: 1.4 },
+          },
+          {
+            code: 'FINCB8373',
+            name: 'Applied Value Investing',
+            credits: 3.0,
+            second_year: { tier: 'high', ratio: 12.1 },
+            first_year: { tier: 'high', ratio: 12.1 },
+          },
+          {
+            code: 'FINCB8376',
+            name: 'Distressed Value Investing',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 2.3 },
+            first_year: { tier: 'medium', ratio: 2.3 },
+          },
+          {
+            code: 'FINCB8377',
+            name: 'Value Investing',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 2.4 },
+            first_year: { tier: 'high', ratio: 2.4 },
+          },
+          {
+            code: 'FINCB8380',
+            name: 'Value Investing with Legends',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.8 },
+            first_year: { tier: 'high', ratio: 1.8 },
+          },
+          {
+            code: 'FINCB8385',
+            name: 'VC Seminar',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 2.6 },
+            first_year: { tier: 'high', ratio: 2.6 },
+          },
+          {
+            code: 'FINCB8396',
+            name: 'Alternative Assets in Institutional Portfolios',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.0 },
+            first_year: { tier: 'medium', ratio: 1.0 },
+          },
+          {
+            code: 'FINCB8399',
+            name: 'Foundations of Business Law',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 3.7 },
+            first_year: { tier: 'high', ratio: 3.7 },
+          },
+          {
+            code: 'FINCB8401',
+            name: 'Short Selling',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 2.8 },
+            first_year: { tier: 'medium', ratio: 2.8 },
+          },
+          {
+            code: 'FINCB8402',
+            name: 'Foundations of Deal Law',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 2.9 },
+            first_year: { tier: 'medium', ratio: 2.9 },
+          },
+          {
+            code: 'FINCB8434',
+            name: 'Value Investing in Credit Markets',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 3.6 },
+            first_year: { tier: 'high', ratio: 3.6 },
+          },
+          {
+            code: 'FINCB8439',
+            name: 'Foundations of VC (Half Term)',
+            credits: 1.5,
+            second_year: { tier: 'high', ratio: 2.4 },
+            first_year: { tier: 'medium', ratio: 2.4 },
+          },
+          {
+            code: 'FINCB8442',
+            name: 'Shareholder Activism',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 5.7 },
+            first_year: { tier: 'high', ratio: 5.7 },
+          },
+          {
+            code: 'FINCB8443',
+            name: 'Corporate Restructuring',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.5 },
+            first_year: { tier: 'medium', ratio: 1.5 },
+          },
+          {
+            code: 'FINCB8452',
+            name: 'Project Finance: Principles and Application to Emerging Markets',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.0 },
+            first_year: { tier: 'medium', ratio: 1.0 },
+          },
+          {
+            code: 'FINCB8453',
+            name: 'Infrastructure Investing',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.9 },
+            first_year: { tier: 'medium', ratio: 1.9 },
+          },
+          {
+            code: 'FINCB8461',
+            name: 'Practice of Wealth Management for High-Net-Worth Clients',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.3 },
+            first_year: { tier: 'medium', ratio: 1.3 },
+          },
+          {
+            code: 'FINCB8462',
+            name: 'An Introduction to Blockchain and Cryptocurrencies',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 2.0 },
+            first_year: { tier: 'medium', ratio: 2.0 },
+          },
+          {
+            code: 'FINCB8465',
+            name: 'Building a VC Investment Thesis',
+            credits: 3.0,
+            second_year: { tier: 'high', ratio: 4.5 },
+            first_year: { tier: 'medium', ratio: 4.5 },
+          },
+          {
+            code: 'FINCB8469',
+            name: 'Distressed Real Estate Investing',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 0.5 },
+            first_year: { tier: 'medium', ratio: 0.5 },
+          },
+          {
+            code: 'FINCB8470',
+            name: 'Value Investing in Private Credit',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 2.2 },
+            first_year: { tier: 'medium', ratio: 2.2 },
+          },
+          {
+            code: 'FINCB8528',
+            name: 'Family Enterprise and Wealth',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.1 },
+            first_year: { tier: 'medium', ratio: 1.1 },
+          },
+          {
+            code: 'FINCB8746',
+            name: 'Investing in Medical Technologies',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.0 },
+            first_year: { tier: 'medium', ratio: 1.0 },
+          },
+          {
+            code: 'FINCB8767',
+            name: 'Investing in Social Ventures',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.9 },
+            first_year: { tier: 'medium', ratio: 1.9 },
+          },
+          {
+            code: 'MGMTB8507',
+            name: 'Organizational Change',
+            credits: 3.0,
+            second_year: { tier: 'high', ratio: 4.4 },
+            first_year: { tier: 'high', ratio: 4.4 },
+          },
+          {
+            code: 'MGMTB8510',
+            name: 'Managerial Negotiations',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.5 },
+            first_year: { tier: 'medium', ratio: 1.5 },
+          },
+          {
+            code: 'MGMTB8511',
+            name: 'Turnaround Management',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 2.1 },
+            first_year: { tier: 'medium', ratio: 2.1 },
+          },
+          {
+            code: 'MGMTB8515',
+            name: 'Top Management Process',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 2.0 },
+            first_year: { tier: 'medium', ratio: 2.0 },
+          },
+          {
+            code: 'MGMTB8516',
+            name: 'Lab-to-Market: Accelerating Biomedical Innovation',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.1 },
+            first_year: { tier: 'medium', ratio: 1.1 },
+          },
+          {
+            code: 'MGMTB8518',
+            name: 'Foundations of Entrepreneurship',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.4 },
+            first_year: { tier: 'medium', ratio: 1.4 },
+          },
+          {
+            code: 'MGMTB8519',
+            name: 'Launch Your Startup',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 0.8 },
+            first_year: { tier: 'medium', ratio: 0.8 },
+          },
+          {
+            code: 'MGMTB8520',
+            name: 'Success, Satisfaction & Sustainability',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.5 },
+            first_year: { tier: 'medium', ratio: 1.5 },
+          },
+          {
+            code: 'MGMTB8523',
+            name: 'Entrepreneurship Through Acquisition',
+            credits: 3.0,
+            second_year: { tier: 'high', ratio: 5.7 },
+            first_year: { tier: 'high', ratio: 5.7 },
+          },
+          {
+            code: 'MGMTB8524',
+            name: 'Managerial Decision Making (Full-Term)',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.2 },
+            first_year: { tier: 'medium', ratio: 1.2 },
+          },
+          {
+            code: 'MGMTB8525',
+            name: 'Designing the Life You Want',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.5 },
+            first_year: { tier: 'medium', ratio: 1.5 },
+          },
+          {
+            code: 'MGMTB8529',
+            name: 'Family Business Management',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.4 },
+            first_year: { tier: 'medium', ratio: 1.4 },
+          },
+          {
+            code: 'MGMTB8531',
+            name: 'Power & Influence',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 3.0 },
+            first_year: { tier: 'high', ratio: 3.0 },
+          },
+          {
+            code: 'MGMTB8533',
+            name: 'Family Office Management',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.7 },
+            first_year: { tier: 'medium', ratio: 1.7 },
+          },
+          {
+            code: 'MGMTB8536',
+            name: 'Strategy and Competition in Pharmaceuticals and Biotechnology',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.2 },
+            first_year: { tier: 'low', ratio: 1.2 },
+          },
+          {
+            code: 'MGMTB8538',
+            name: "The Leader's Voice: Communication Skills for Leading Organizations",
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 2.2 },
+            first_year: { tier: 'medium', ratio: 2.2 },
+          },
+          {
+            code: 'MGMTB8544',
+            name: 'The Nonprofit Sector & the City',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 2.4 },
+            first_year: { tier: 'medium', ratio: 2.4 },
+          },
+          {
+            code: 'MGMTB8545',
+            name: 'High Performing Nonprofits',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 0.9 },
+            first_year: { tier: 'medium', ratio: 0.9 },
+          },
+          {
+            code: 'MGMTB8551',
+            name: 'Future of Work: Strategy & Leadership',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.5 },
+            first_year: { tier: 'medium', ratio: 1.5 },
+          },
+          {
+            code: 'MGMTB8553',
+            name: 'Managerial Decision Making (Half-Term)',
+            credits: 1.5,
+            second_year: { tier: 'medium', ratio: 2.0 },
+            first_year: { tier: 'medium', ratio: 2.0 },
+          },
+          {
+            code: 'MGMTB8558',
+            name: 'Education Leadership',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.9 },
+            first_year: { tier: 'medium', ratio: 1.9 },
+          },
+          {
+            code: 'MGMTB8561',
+            name: 'Entrepreneurial Law for Start-Ups: Planning for Success',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.6 },
+            first_year: { tier: 'medium', ratio: 1.6 },
+          },
+          {
+            code: 'MGMTB8564',
+            name: 'Motivation Science',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 2.5 },
+            first_year: { tier: 'medium', ratio: 2.5 },
+          },
+          {
+            code: 'MGMTB8570',
+            name: 'Technology Strategy',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 3.3 },
+            first_year: { tier: 'high', ratio: 3.3 },
+          },
+          {
+            code: 'MGMTB8573',
+            name: 'Global Philanthropy',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.9 },
+            first_year: { tier: 'medium', ratio: 1.9 },
+          },
+          {
+            code: 'MGMTB8575',
+            name: 'Fundamentals of Governance',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.7 },
+            first_year: { tier: 'medium', ratio: 1.7 },
+          },
+          {
+            code: 'MGMTB8577',
+            name: 'Think Bigger',
+            credits: 3.0,
+            second_year: { tier: 'low', ratio: 1.0 },
+            first_year: { tier: 'low', ratio: 1.0 },
+          },
+          {
+            code: 'MGMTB8578',
+            name: 'Public Policy and the Healthcare Industry',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.2 },
+            first_year: { tier: 'low', ratio: 1.2 },
+          },
+          {
+            code: 'MGMTB8582',
+            name: 'Food Entrepreneurship',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 3.6 },
+            first_year: { tier: 'high', ratio: 3.6 },
+          },
+          {
+            code: 'MGMTB8586',
+            name: 'Entrepreneurial Strategy',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.9 },
+            first_year: { tier: 'medium', ratio: 1.9 },
+          },
+          {
+            code: 'MGMTB8587',
+            name: 'Business Strategies and Solving Social Problems',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 2.0 },
+            first_year: { tier: 'medium', ratio: 2.0 },
+          },
+          {
+            code: 'MGMTB8590',
+            name: 'People Analytics and Strategy',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.8 },
+            first_year: { tier: 'medium', ratio: 1.8 },
+          },
+          {
+            code: 'MGMTB8592',
+            name: 'Immersive Teamwork',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 2.6 },
+            first_year: { tier: 'medium', ratio: 2.6 },
+          },
+          {
+            code: 'MGMTB8597',
+            name: 'The Making of a Diversity, Equity and Inclusion Leader',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.3 },
+            first_year: { tier: 'medium', ratio: 1.3 },
+          },
+          {
+            code: 'MRKTB8506',
+            name: 'Launch Your Startup II',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 0.4 },
+            first_year: { tier: 'medium', ratio: 0.4 },
+          },
+          {
+            code: 'MRKTB8568',
+            name: 'Branding in the Arts',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.4 },
+            first_year: { tier: 'medium', ratio: 1.4 },
+          },
+          {
+            code: 'MRKTB8604',
+            name: 'Frontiers in Retailing',
+            credits: 3.0,
+            second_year: { tier: 'high', ratio: 4.3 },
+            first_year: { tier: 'high', ratio: 4.3 },
+          },
+          {
+            code: 'MRKTB8605',
+            name: 'Succeeding in Consulting: from Project Manager to CEO Advisor',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 2.8 },
+            first_year: { tier: 'medium', ratio: 2.8 },
+          },
+          {
+            code: 'MRKTB8607',
+            name: 'Strategic Consumer Insights',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.4 },
+            first_year: { tier: 'medium', ratio: 1.4 },
+          },
+          {
+            code: 'MRKTB8608',
+            name: 'Tech Ethics',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 2.0 },
+            first_year: { tier: 'medium', ratio: 2.0 },
+          },
+          {
+            code: 'MRKTB8609',
+            name: 'Generative AI for Business',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 2.0 },
+            first_year: { tier: 'medium', ratio: 2.0 },
+          },
+          {
+            code: 'MRKTB8610',
+            name: 'Growth Hacking',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 2.8 },
+            first_year: { tier: 'medium', ratio: 2.8 },
+          },
+          {
+            code: 'MRKTB8611',
+            name: 'Media, Platforms, and Content (Half Term)',
+            credits: 1.5,
+            second_year: { tier: 'medium', ratio: 1.3 },
+            first_year: { tier: 'medium', ratio: 1.3 },
+          },
+          {
+            code: 'MRKTB8612',
+            name: 'Premium Brand Strategy',
+            credits: 3.0,
+            second_year: { tier: 'high', ratio: 7.4 },
+            first_year: { tier: 'high', ratio: 7.4 },
+          },
+          {
+            code: 'MRKTB8613',
+            name: 'Entrepreneurial Selling',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 2.4 },
+            first_year: { tier: 'medium', ratio: 2.4 },
+          },
+          {
+            code: 'MRKTB8615',
+            name: 'Media Marketing and Entrepreneurship',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 2.3 },
+            first_year: { tier: 'medium', ratio: 2.3 },
+          },
+          {
+            code: 'MRKTB8619',
+            name: 'Behavioral Economics & Decision Making',
+            credits: 3.0,
+            second_year: { tier: 'high', ratio: 1.2 },
+            first_year: { tier: 'medium', ratio: 1.2 },
+          },
+          {
+            code: 'MRKTB8622',
+            name: 'Intro to User Experience',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 2.2 },
+            first_year: { tier: 'medium', ratio: 2.2 },
+          },
+          {
+            code: 'MRKTB8624',
+            name: 'Driving Strategic Impact: Mastering the Tools of Strategy Consulting',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 2.6 },
+            first_year: { tier: 'medium', ratio: 2.6 },
+          },
+          {
+            code: 'MRKTB8629',
+            name: 'Entertainment Marketing & The Crafting of Celebrity Businesses',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 2.9 },
+            first_year: { tier: 'medium', ratio: 2.9 },
+          },
+          {
+            code: 'MRKTB8632',
+            name: 'Digital Product Management Lab',
+            credits: 3.0,
+            second_year: { tier: 'low', ratio: 0.9 },
+            first_year: { tier: 'low', ratio: 0.9 },
+          },
+          {
+            code: 'MRKTB8633',
+            name: 'Data Science for Marketing Managers',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 0.6 },
+            first_year: { tier: 'medium', ratio: 0.6 },
+          },
+          {
+            code: 'MRKTB8636',
+            name: 'Product Management',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.3 },
+            first_year: { tier: 'medium', ratio: 1.3 },
+          },
+          {
+            code: 'MRKTB8640',
+            name: 'The Art of Teaming Up: Marketing Partnerships and Commercial Arrangements',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.3 },
+            first_year: { tier: 'medium', ratio: 1.3 },
+          },
+          {
+            code: 'MRKTB8641',
+            name: 'Retail Management',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.6 },
+            first_year: { tier: 'medium', ratio: 1.6 },
+          },
+          {
+            code: 'MRKTB8643',
+            name: 'Retail Analytics',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.6 },
+            first_year: { tier: 'medium', ratio: 1.6 },
+          },
+          {
+            code: 'MRKTB8648',
+            name: 'The Marketing of an American President',
+            credits: 3.0,
+            second_year: { tier: 'high', ratio: 6.1 },
+            first_year: { tier: 'high', ratio: 6.1 },
+          },
+          {
+            code: 'MRKTB8649',
+            name: 'Pricing Strategies',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 3.5 },
+            first_year: { tier: 'high', ratio: 3.5 },
+          },
+          {
+            code: 'MRKTB8654',
+            name: 'Sustainable Marketing',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.0 },
+            first_year: { tier: 'medium', ratio: 1.0 },
+          },
+          {
+            code: 'MRKTB8666',
+            name: 'Media Platforms and Content: A Foundations Course',
+            credits: 3.0,
+            second_year: { tier: 'low', ratio: 1.2 },
+            first_year: { tier: 'low', ratio: 1.2 },
+          },
+          {
+            code: 'MRKTB8667',
+            name: 'Foundations of Product Innovation',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 2.2 },
+            first_year: { tier: 'medium', ratio: 2.2 },
+          },
+          {
+            code: 'MRKTB8679',
+            name: 'Digital Marketing (Full-Term)',
+            credits: 3.0,
+            second_year: { tier: 'low', ratio: 1.4 },
+            first_year: { tier: 'low', ratio: 1.4 },
+          },
+          {
+            code: 'MRKTB8680',
+            name: 'Digital Marketing (Half Term)',
+            credits: 1.5,
+            second_year: { tier: 'medium', ratio: 1.8 },
+            first_year: { tier: 'medium', ratio: 1.8 },
+          },
+          {
+            code: 'MRKTB8685',
+            name: 'Media and Entertainment: Strategy Consulting Projects',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 2.9 },
+            first_year: { tier: 'medium', ratio: 2.9 },
+          },
+          {
+            code: 'MRKTB8693',
+            name: 'A Closer Look at the Start-Up Nation',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 5.6 },
+            first_year: { tier: 'high', ratio: 5.6 },
+          },
+          {
+            code: 'MRKTB8694',
+            name: 'Building the Sales Machine',
+            credits: 3.0,
+            second_year: { tier: 'low', ratio: 1.7 },
+            first_year: { tier: 'low', ratio: 1.7 },
+          },
+        ],
+        emba: [
+          {
+            code: 'ACCTB7009',
+            name: 'Financial Statement Analysis and Valuation',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 0.7 },
+            first_year: { tier: 'medium', ratio: 0.7 },
+          },
+          {
+            code: 'BUECB5960',
+            name: 'Banking and Monetary Policy in the Global Economy (LBS Exchange Course)',
+            credits: 3.0,
+            second_year: { tier: 'high', ratio: 11.0 },
+            first_year: { tier: 'high', ratio: 11.0 },
+          },
+          {
+            code: 'BUECB7212',
+            name: 'Climate Policy',
+            credits: 3.0,
+            second_year: { tier: 'low', ratio: 0.3 },
+            first_year: { tier: 'low', ratio: 0.3 },
+          },
+          {
+            code: 'BUECB7216',
+            name: 'Economics of Strategic Behavior',
+            credits: 3.0,
+            second_year: { tier: 'low', ratio: 0.8 },
+            first_year: { tier: 'low', ratio: 0.8 },
+          },
+          {
+            code: 'BUECB7251',
+            name: 'Financial Markets and the Macroeconomy',
+            credits: 3.0,
+            second_year: { tier: 'low', ratio: 0.4 },
+            first_year: { tier: 'low', ratio: 0.4 },
+          },
+          {
+            code: 'BUECB7255',
+            name: 'FinTech: Consumer Financial Services',
+            credits: 3.0,
+            second_year: { tier: 'low', ratio: 0.6 },
+            first_year: { tier: 'low', ratio: 0.6 },
+          },
+          {
+            code: 'BUSIB7705',
+            name: 'Business and Climate Change',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 0.7 },
+            first_year: { tier: 'medium', ratio: 0.7 },
+          },
+          {
+            code: 'BUSIB7755',
+            name: 'Business Law',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.6 },
+            first_year: { tier: 'medium', ratio: 1.6 },
+          },
+          {
+            code: 'DROMB7101',
+            name: 'Business Analytics II',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.0 },
+            first_year: { tier: 'medium', ratio: 1.0 },
+          },
+          {
+            code: 'DROMB7106',
+            name: 'Operations Strategy',
+            credits: 3.0,
+            second_year: { tier: 'low', ratio: 0.9 },
+            first_year: { tier: 'low', ratio: 0.9 },
+          },
+          {
+            code: 'DROMB7107',
+            name: 'Service Operations Management',
+            credits: 3.0,
+            second_year: { tier: 'low', ratio: 0.7 },
+            first_year: { tier: 'low', ratio: 0.7 },
+          },
+          {
+            code: 'DROMB7114',
+            name: 'Applied Regression Analysis',
+            credits: 3.0,
+            second_year: { tier: 'low', ratio: 0.9 },
+            first_year: { tier: 'low', ratio: 0.9 },
+          },
+          {
+            code: 'DROMB7117',
+            name: 'Business Analytics 3: Modern AI, Deep Learning, and Generative AI',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 0.6 },
+            first_year: { tier: 'medium', ratio: 0.6 },
+          },
+          {
+            code: 'DROMB7131',
+            name: 'Sports Analytics',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 0.9 },
+            first_year: { tier: 'medium', ratio: 0.9 },
+          },
+          {
+            code: 'FINCB5908',
+            name: 'Equity Investment Management (LBS Exchange Course)',
+            credits: 3.0,
+            second_year: { tier: 'high', ratio: 10.3 },
+            first_year: { tier: 'high', ratio: 10.3 },
+          },
+          {
+            code: 'FINCB7306',
+            name: 'Capital Markets & Investments',
+            credits: 3.0,
+            second_year: { tier: 'high', ratio: 0.7 },
+            first_year: { tier: 'medium', ratio: 0.7 },
+          },
+          {
+            code: 'FINCB7325',
+            name: 'Mergers & Acquisitions',
+            credits: 3.0,
+            second_year: { tier: 'low', ratio: 1.1 },
+            first_year: { tier: 'low', ratio: 1.1 },
+          },
+          {
+            code: 'FINCB7358',
+            name: 'Strategic Equity Finance',
+            credits: 3.0,
+            second_year: { tier: 'low', ratio: 0.6 },
+            first_year: { tier: 'low', ratio: 0.6 },
+          },
+          {
+            code: 'FINCB7363',
+            name: 'Climate Finance',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 0.2 },
+            first_year: { tier: 'medium', ratio: 0.2 },
+          },
+          {
+            code: 'FINCB7369',
+            name: 'Applied Security Analysis I',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 0.6 },
+            first_year: { tier: 'medium', ratio: 0.6 },
+          },
+          {
+            code: 'FINCB7372',
+            name: 'Seminar in Value Investing',
+            credits: 3.0,
+            second_year: { tier: 'low', ratio: 0.8 },
+            first_year: { tier: 'low', ratio: 0.8 },
+          },
+          {
+            code: 'FINCB7373',
+            name: 'Applied Value Investing',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.4 },
+            first_year: { tier: 'medium', ratio: 1.4 },
+          },
+          {
+            code: 'FINCB7376',
+            name: 'Distressed Value Investing',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 0.9 },
+            first_year: { tier: 'medium', ratio: 0.9 },
+          },
+          {
+            code: 'FINCB7383',
+            name: 'Value Investing Across the Capital Structure',
+            credits: 3.0,
+            second_year: { tier: 'low', ratio: 1.6 },
+            first_year: { tier: 'low', ratio: 1.6 },
+          },
+          {
+            code: 'FINCB7439',
+            name: 'Foundations of VC (Half Term)',
+            credits: 1.5,
+            second_year: { tier: 'medium', ratio: 0.3 },
+            first_year: { tier: 'medium', ratio: 0.3 },
+          },
+          {
+            code: 'FINCB7457',
+            name: 'Foundations of Private Equity',
+            credits: 3.0,
+            second_year: { tier: 'low', ratio: 1.1 },
+            first_year: { tier: 'low', ratio: 1.1 },
+          },
+          {
+            code: 'FINCB7465',
+            name: 'Building a VC Investment Thesis',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 0.9 },
+            first_year: { tier: 'medium', ratio: 0.9 },
+          },
+          {
+            code: 'FINCB7493',
+            name: 'Real Estate as an Asset and a Business',
+            credits: 3.0,
+            second_year: { tier: 'low', ratio: 0.9 },
+            first_year: { tier: 'low', ratio: 0.9 },
+          },
+          {
+            code: 'FINCB7528',
+            name: 'Family Enterprise and Wealth',
+            credits: 3.0,
+            second_year: { tier: 'low', ratio: 0.6 },
+            first_year: { tier: 'low', ratio: 0.6 },
+          },
+          {
+            code: 'MGMTB5925',
+            name: 'Inter-Personal Dynamics (LBS Exchange Course)',
+            credits: 3.0,
+            second_year: { tier: 'high', ratio: 9.3 },
+            first_year: { tier: 'high', ratio: 9.3 },
+          },
+          {
+            code: 'MGMTB5947',
+            name: 'The Future of Work (LBS Exchange Course)',
+            credits: 3.0,
+            second_year: { tier: 'high', ratio: 15.7 },
+            first_year: { tier: 'high', ratio: 15.7 },
+          },
+          {
+            code: 'MGMTB7510',
+            name: 'Managerial Negotiations',
+            credits: 3.0,
+            second_year: { tier: 'low', ratio: 1.2 },
+            first_year: { tier: 'medium', ratio: 1.2 },
+          },
+          {
+            code: 'MGMTB7513',
+            name: 'Personal Leadership & Success',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.6 },
+            first_year: { tier: 'medium', ratio: 1.6 },
+          },
+          {
+            code: 'MGMTB7514',
+            name: "Napoleon's Glance",
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 2.2 },
+            first_year: { tier: 'medium', ratio: 2.2 },
+          },
+          {
+            code: 'MGMTB7515',
+            name: 'Top Management Process',
+            credits: 3.0,
+            second_year: { tier: 'low', ratio: 0.8 },
+            first_year: { tier: 'low', ratio: 0.8 },
+          },
+          {
+            code: 'MGMTB7518',
+            name: 'Foundations of Entrepreneurship',
+            credits: 3.0,
+            second_year: { tier: 'low', ratio: 1.2 },
+            first_year: { tier: 'low', ratio: 1.2 },
+          },
+          {
+            code: 'MGMTB7531',
+            name: 'Power & Influence',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 2.0 },
+            first_year: { tier: 'medium', ratio: 2.0 },
+          },
+          {
+            code: 'MGMTB7538',
+            name: "The Leader's Voice: Communication Skills for Leading Organizations",
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.9 },
+            first_year: { tier: 'medium', ratio: 1.9 },
+          },
+          {
+            code: 'MGMTB7553',
+            name: 'Managerial Decision Making',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.1 },
+            first_year: { tier: 'medium', ratio: 1.1 },
+          },
+          {
+            code: 'MGMTB7570',
+            name: 'Technology Strategy',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.3 },
+            first_year: { tier: 'medium', ratio: 1.3 },
+          },
+          {
+            code: 'MGMTB7583',
+            name: 'Executive Ethics',
+            credits: 3.0,
+            second_year: { tier: 'low', ratio: 0.9 },
+            first_year: { tier: 'low', ratio: 0.9 },
+          },
+          {
+            code: 'MGMTB7588',
+            name: 'Executing Strategic Change',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 0.7 },
+            first_year: { tier: 'medium', ratio: 0.7 },
+          },
+          {
+            code: 'MGMTB7590',
+            name: 'People Analytics and Strategy',
+            credits: 3.0,
+            second_year: { tier: 'high', ratio: 0.5 },
+            first_year: { tier: 'high', ratio: 0.5 },
+          },
+          {
+            code: 'MGMTB7592',
+            name: 'Immersive Teamwork',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 1.2 },
+            first_year: { tier: 'medium', ratio: 1.2 },
+          },
+          {
+            code: 'MRKTB5955',
+            name: 'Brand Management (LBS Exchange Course)',
+            credits: 3.0,
+            second_year: { tier: 'high', ratio: 13.7 },
+            first_year: { tier: 'high', ratio: 13.7 },
+          },
+          {
+            code: 'MRKTB7607',
+            name: 'Strategic Consumer Insights',
+            credits: 3.0,
+            second_year: { tier: 'high', ratio: 0.6 },
+            first_year: { tier: 'high', ratio: 0.6 },
+          },
+          {
+            code: 'MRKTB7609',
+            name: 'Generative AI for Business',
+            credits: 3.0,
+            second_year: { tier: 'high', ratio: 0.5 },
+            first_year: { tier: 'high', ratio: 0.5 },
+          },
+          {
+            code: 'MRKTB7611',
+            name: 'Media, Platforms, and Content',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 0.2 },
+            first_year: { tier: 'medium', ratio: 0.2 },
+          },
+          {
+            code: 'MRKTB7613',
+            name: 'Entrepreneurial Selling',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 0.2 },
+            first_year: { tier: 'medium', ratio: 0.2 },
+          },
+          {
+            code: 'MRKTB7636',
+            name: 'Product Management',
+            credits: 3.0,
+            second_year: { tier: 'low', ratio: 0.8 },
+            first_year: { tier: 'low', ratio: 0.8 },
+          },
+          {
+            code: 'MRKTB7641',
+            name: 'Retail Management',
+            credits: 3.0,
+            second_year: { tier: 'low', ratio: 0.5 },
+            first_year: { tier: 'low', ratio: 0.5 },
+          },
+          {
+            code: 'MRKTB7654',
+            name: 'Sustainable Marketing',
+            credits: 3.0,
+            second_year: { tier: 'high', ratio: 0.4 },
+            first_year: { tier: 'high', ratio: 0.4 },
+          },
+          {
+            code: 'MRKTB7677',
+            name: 'High Tech Entrepreneurship',
+            credits: 3.0,
+            second_year: { tier: 'high', ratio: 1.7 },
+            first_year: { tier: 'high', ratio: 1.7 },
+          },
+          {
+            code: 'MRKTB7679',
+            name: 'Digital Marketing',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 0.6 },
+            first_year: { tier: 'medium', ratio: 0.6 },
+          },
+          {
+            code: 'MRKTB7694',
+            name: 'Building the Sales Machine',
+            credits: 3.0,
+            second_year: { tier: 'medium', ratio: 0.6 },
+            first_year: { tier: 'medium', ratio: 0.6 },
+          },
+        ],
+      }
+
+      // --- 2. STATE MANAGEMENT ---
+      let currentProgram = 'mba'
+      let selectedCourses = [] // Array of objects { ...courseData, id: unique }
+
+      // --- 3. CORE FUNCTIONS ---
+
+      function setProgram(prog) {
+        currentProgram = prog
+        selectedCourses = [] // Reset on program switch
+        document.querySelectorAll('.toggle-btn').forEach((b) => b.classList.remove('active'))
+        document.getElementById(prog === 'mba' ? 'btnMBA' : 'btnEMBA').classList.add('active')
+        updateUI()
+      }
+
+      function getCourseTierData(course) {
+        const year = document.getElementById('yearSelect').value
+        const data = course[year]
+        // Fallback logic if data missing
+        return data || { tier: 'medium', ratio: 1.0 }
+      }
+
+      function toggleCourse(code) {
+        // Check if already selected
+        const idx = selectedCourses.findIndex((c) => c.code === code)
+        if (idx > -1) {
+          // Remove
+          selectedCourses.splice(idx, 1)
+        } else {
+          // Add
+          const course = DB[currentProgram].find((c) => c.code === code)
+          if (course) selectedCourses.push(course)
+        }
+        updateUI()
+      }
+
+      function moveRank(index, direction) {
+        if (direction === -1 && index > 0) {
+          ;[selectedCourses[index], selectedCourses[index - 1]] = [selectedCourses[index - 1], selectedCourses[index]]
+        } else if (direction === 1 && index < selectedCourses.length - 1) {
+          ;[selectedCourses[index], selectedCourses[index + 1]] = [selectedCourses[index + 1], selectedCourses[index]]
+        }
+        updateUI()
+      }
+
+      function removeRank(index) {
+        selectedCourses.splice(index, 1)
+        updateUI()
+      }
+
+      // --- 4. RENDERING ---
+
+      function updateUI() {
+        renderMarketplace()
+        renderRankingList()
+        updateStats()
+        analyzeStrategy()
+      }
+
+      function renderMarketplace() {
+        const container = document.getElementById('courseListContainer')
+        const search = document.getElementById('searchInput').value.toLowerCase()
+        const courses = DB[currentProgram].filter(
+          (c) => c.code.toLowerCase().includes(search) || c.name.toLowerCase().includes(search),
+        )
+
+        let html = ''
+        courses.forEach((c) => {
+          const isSelected = selectedCourses.some((sc) => sc.code === c.code)
+          const tierData = getCourseTierData(c)
+          const badgeClass = `badge-${tierData.tier}` // badge-high, badge-medium
+          const btnStyle = isSelected ? 'background:#e8f5e9; border-color:#2e7d32;' : ''
+
+          html += `
+                <div class="course-card" style="${btnStyle}" onclick="toggleCourse('${c.code}')">
+                    <div class="course-info">
+                        <h4>${c.code} ${isSelected ? '✅' : ''}</h4>
+                        <p>${c.name}</p>
+                    </div>
+                    <div class="course-meta">
+                        <span class="badge ${badgeClass}">${tierData.tier.toUpperCase()}</span>
+                        <span style="font-size:0.75rem; color:#888;">Ratio: ${tierData.ratio}:1</span>
+                        <span style="font-size:0.75rem; color:#666; font-weight:bold;">${c.credits} Credits</span>
+                    </div>
+                </div>
+            `
+        })
+        container.innerHTML = html
+      }
+
+      function renderRankingList() {
+        const container = document.getElementById('rankingList')
+        if (selectedCourses.length === 0) {
+          container.innerHTML =
+            '<div style="text-align: center; padding: 40px; color: #999;">Select courses from the left to begin ranking.</div>'
+          return
+        }
+
+        let html = ''
+        selectedCourses.forEach((c, index) => {
+          const tierData = getCourseTierData(c)
+          // Visual check for specific warnings (logic handled in analyzeStrategy, but visual cues here)
+          let borderClass = ''
+          if (index === 0 && tierData.tier === 'low') borderClass = 'warning-rank'
+
+          html += `
+                <div class="rank-item ${borderClass}">
+                    <div class="rank-number">${index + 1}</div>
+                    <div class="rank-content">
+                        <h5>${c.code}</h5>
+                        <div style="font-size:0.8rem; color:#666;">${c.name} (${c.credits} Cr)</div>
+                    </div>
+                    <div class="badge badge-${tierData.tier}" style="margin-right:10px;">${tierData.tier}</div>
+                    <div class="rank-controls">
+                        <button class="btn-sm" onclick="moveRank(${index}, -1)">▲</button>
+                        <button class="btn-sm" onclick="moveRank(${index}, 1)">▼</button>
+                        <button class="btn-sm btn-remove" onclick="removeRank(${index})">×</button>
+                    </div>
+                </div>
+            `
+        })
+        container.innerHTML = html
+      }
+
+      // --- 5. ANALYSIS ENGINE ---
+
+      function updateStats() {
+        const totalCredits = selectedCourses.reduce((sum, c) => sum + c.credits, 0)
+        document.getElementById('countVal').innerText = selectedCourses.length
+        document.getElementById('creditsVal').innerText = totalCredits
+        document.getElementById('headerCredits').innerText = totalCredits
+
+        // Simple Portfolio Risk Calc
+        const highRiskCount = selectedCourses.filter((c) => getCourseTierData(c).tier === 'high').length
+        const riskPct = selectedCourses.length ? (highRiskCount / selectedCourses.length) * 100 : 0
+
+        let riskLabel = 'Low'
+        let color = '#2e7d32'
+        if (riskPct > 40) {
+          riskLabel = 'Med'
+          color = '#e65100'
+        }
+        if (riskPct > 70) {
+          riskLabel = 'High'
+          color = '#c62828'
+        }
+
+        const riskEl = document.getElementById('riskVal')
+        riskEl.innerText = riskLabel
+        riskEl.style.color = color
+      }
+
+      function analyzeStrategy() {
+        const container = document.getElementById('insightsPanel')
+        const insights = []
+
+        if (selectedCourses.length === 0) {
+          container.innerHTML = ''
+          return
+        }
+
+        // 1. Check Rank #1
+        const firstPick = selectedCourses[0]
+        const firstPickTier = getCourseTierData(firstPick).tier
+        if (firstPickTier === 'low') {
+          insights.push({
+            type: 'insight-warn',
+            text: `⚠️ <strong>Possible Wasted Rank:</strong> You have ranked <em>${firstPick.code}</em> as #1. This is historically a Low Demand course. You could likely rank this lower (#4 or #5) and still get it, saving your #1 spot for a harder-to-get course.`,
+          })
+        }
+
+        // 2. Check "The Cliff" (Top 3 are all High Demand)
+        const top3 = selectedCourses.slice(0, 3)
+        const highRiskTop3 = top3.filter((c) => getCourseTierData(c).tier === 'high').length
+        if (highRiskTop3 === 3) {
+          insights.push({
+            type: 'insight-crit',
+            text: `🛑 <strong>Aggressive Strategy:</strong> Your Top 3 choices are ALL historically High Demand. There is a statistical chance you get 0 or only 1 of these. Ensure Ranks #4 and #5 are "Safe" options.`,
+          })
+        }
+
+        // 3. Credit Check
+        const totalCredits = selectedCourses.reduce((sum, c) => sum + c.credits, 0)
+        if (totalCredits < 9) {
+          insights.push({
+            type: 'insight-info',
+            text: `ℹ️ <strong>Building Phase:</strong> You only have ${totalCredits} credits selected. Most students aim for 15. Keep adding!`,
+          })
+        }
+
+        // 4. Year Specific Warning
+        const year = document.getElementById('yearSelect').value
+        if (year === 'first_year') {
+          const impossibleCounts = selectedCourses.filter((c) => getCourseTierData(c).ratio > 5).length
+          if (impossibleCounts > 0) {
+            insights.push({
+              type: 'insight-warn',
+              text: `🎓 <strong>1st Year Reality Check:</strong> You have selected courses that are extremely difficult for 1st years to get (Ratio > 5:1). Treat these as lottery tickets, not plans.`,
+            })
+          }
+        }
+
+        // Render
+        container.innerHTML = insights.map((i) => `<div class="insight-card ${i.type}">${i.text}</div>`).join('')
+      }
+
+      // Init
+      updateUI()
+    </script>
+  </body>
+</html>
